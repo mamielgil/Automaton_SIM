@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+button{
+
+   @apply border border-black rounded
+   font-serif
+   enabled:hover:bg-blue-600 enabled:active:bg-gray-600
+   enabled:bg-gray-400;
+}
