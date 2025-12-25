@@ -13,11 +13,20 @@ export default class Node{
 
     draw(gc:CanvasRenderingContext2D){
         // We now draw the circle with its corresponding information
-
         gc.save();
+        // We now draw all the elements that form the node
 
+        gc.beginPath();
+        gc.arc(this.my_x,this.my_y,10,0,2 * Math.PI);
+        gc.closePath();
+        gc.fillStyle = "yellow";
+        gc.fill();
 
+        gc.strokeStyle = "black";
+        gc.lineWidth = 1;
+        gc.stroke();
         gc.restore();
+        console.log("i am drawing");
 
     }
 
