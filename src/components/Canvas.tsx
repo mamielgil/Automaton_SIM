@@ -13,20 +13,23 @@ export function Canvas(){
         }
     },[Model.nodes.value]);
     return(
-        <div class = "bg-gray-400 grow ml-[5px] mr-[5px] mb-[5px] border">
-        <canvas ref = {myCanvas}> onClick = {Model.handleCanvasClick} </canvas>
+        <div class =  "flex bg-gray-400 grow ml-[5px] mr-[5px] mb-[5px] border">
+        <canvas class = "grow" ref = {myCanvas}> onClick = {Model.handleCanvasClick} </canvas>
         </div>
 
     )
 
     function draw_canvas(gc:CanvasRenderingContext2D){
         let canvas = myCanvas.current as HTMLCanvasElement;
+        gc.save();
+        gc.fillStyle = "oklch(0.707 0.022 261.325)";
         gc.fillRect(0,0,canvas.width,canvas.height);
+        gc.restore();
         Model.nodes.value.forEach((node)=>{
-            let new_Node = new Node(node);
+            let new_node = new Node(node);
             // Each render, we create new nodes after having deleted
             // the previous ones
-            new_Node.draw(gc);
+            new_node.draw(gc);
             
 
 
