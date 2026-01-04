@@ -7,7 +7,7 @@ export default function Toolbar(){
         <div class = " bg-sky-800 border-b-2 gap-[5px] flex box-border pl-[5px] pt-[5px] pb-[5px] h-[50px]">
         <button class = "w-[100px] ">Input a word</button>
         <button class = "w-[100px]" onClick = {Model.changeAddMode}>Add Tool</button>
-        <button class = "w-[100px] ">Delete Tool</button>
+        <button class = "w-[100px] " onClick = {Model.changeDeleteMode}>Delete Tool</button>
         <button class = "w-[100px]"> Save</button>
         </div>
 

@@ -1,5 +1,6 @@
 import {signal} from "@preact/signals"
 
+export const NODE_RADIUS = 25;
 // This signal will store the current nodes of the automaton
 export type node_props = {
     id:number;
@@ -18,23 +19,60 @@ export type connection_props = {
 export let nodes = signal<node_props[]>([]);
 
 let node_id:number = 0;
-export const is_Add_Tool_Active = signal(false);
+const is_add_tool_active = signal(false);
+const is_delete_tool_active = signal(false);
 
 export function changeAddMode(){
     // We change the AddMode value alternatively
-    is_Add_Tool_Active.value = !is_Add_Tool_Active.value;
+    let previous_add = is_add_tool_active.value;
+    resetAllButtonSignals();
+    is_add_tool_active.value = !previous_add;
     
 
 }
 
-export function handleCanvasClick(e:Event){
-    console.log(is_Add_Tool_Active.value);
-    if(is_Add_Tool_Active.value){
-        let event = e as MouseEvent;
-        create_node(event.offsetX,event.offsetY);
-    }
+export function changeDeleteMode(){
+    let previous_delete = is_delete_tool_active.value;
+    resetAllButtonSignals();
+    is_delete_tool_active.value = !previous_delete;
+
 }
 
+export function handleCanvasClick(e:Event){
+    let event = e as MouseEvent;
+    
+    if(is_add_tool_active.value){
+        
+        create_node(event.offsetX,event.offsetY);
+    }
+    else if(is_delete_tool_active.value){
+        find_clicked_node(event.offsetX,event.offsetY); 
+
+    }
+
+}
+
+    // If several nodes collide only the latest node in the array will be deleted
+    function find_clicked_node(clicked_x:number,clicked_y:number){
+        // We go through all of the nodes and analyze if there was a node that was clicked
+
+        let collided_id:number = -1;
+        nodes.value.forEach((node)=>{
+            if(clicked_x >= node.pos_x - NODE_RADIUS && clicked_x <= node.pos_x + NODE_RADIUS){
+                // This means that the click is in a valid x location so we now analyze y
+
+                if(clicked_y <= node.pos_y + NODE_RADIUS && clicked_y >= node.pos_y - NODE_RADIUS ){
+                    // This means that it collided with this node so we take its id
+                    collided_id = node.id;
+                }
+            }
+
+        });
+        if(collided_id != -1){
+            // This means that the hitTest yielded true for some node
+            delete_node(collided_id);
+        }
+    }
 export function create_node(x:number,y:number){
     let new_node_info:node_props = {id:node_id, pos_x: x, pos_y: y, connections:[]};
     // We increase the node id so that all nodes have a different id
@@ -43,4 +81,25 @@ export function create_node(x:number,y:number){
     nodes.value = [...nodes.value, new_node_info];
     
 
+}
+
+export function delete_node(id:number){
+    // This function deletes the node with the given id
+
+    nodes.value = nodes.value.filter((node)=> node.id != id);
+
+    // We now delete the connections that existing nodes had with the deleted one
+
+    nodes.value.forEach((node)=>{
+        // We identify those connections with the deleted node and filter them out
+        node.connections = node.connections.filter((connection)=> connection.ending_node != id);
+
+    });
+
+
+}
+
+function resetAllButtonSignals(){
+    is_add_tool_active.value = false;
+    is_delete_tool_active.value = false;
 }

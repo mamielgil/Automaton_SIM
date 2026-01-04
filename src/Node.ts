@@ -1,4 +1,4 @@
-import type { node_props, connection_props } from "./model";
+import { type node_props, type connection_props,NODE_RADIUS } from "./model";
 export default class Node{
     my_id:number;
     my_x:number;
@@ -17,7 +17,7 @@ export default class Node{
         // We now draw all the elements that form the node
 
         gc.beginPath();
-        gc.arc(this.my_x,this.my_y,25,0,2 * Math.PI);
+        gc.arc(this.my_x,this.my_y,NODE_RADIUS,0,2 * Math.PI);
         gc.closePath();
         gc.fillStyle = "yellow";
         gc.fill();
