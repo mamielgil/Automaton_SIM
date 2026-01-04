@@ -51,6 +51,9 @@ export function Canvas(){
             new_node.draw(gc);
             
         });
+
+        // Once all the nodes have been drawn we need to draw the connections
+        // TO DO LATER.....
         }
     }
     return(

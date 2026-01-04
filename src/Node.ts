@@ -30,8 +30,6 @@ export default class Node{
         let myStringHeight = gc.measureText(myString).fontBoundingBoxAscent + gc.measureText(myString).fontBoundingBoxDescent;
         gc.fillText(myString,this.my_x - 0.5 * gc.measureText(myString).width,this.my_y + 0.4 * myStringHeight);
         gc.restore();
-        console.log("i am drawing");
-
     }
 
 

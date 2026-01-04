@@ -25,6 +25,9 @@ const is_add_tool_active = signal(false);
 const is_delete_tool_active = signal(false);
 const is_connections_tool_active = signal(false);
 
+// This array will store the connection that needs to be created
+let connectionPair  = {starting_node : -1 , ending_node: -1, associated_letter: "-1" };
+
 export function changeAddMode(){
     // We change the AddMode value alternatively
     let previous_add = is_add_tool_active.value;
@@ -69,9 +72,25 @@ export function handleCanvasClick(e:Event){
         }
 
     } else if( is_connections_tool_active.value){
+        // We determine if we selected one node to create the connection
+        let collided_id = find_clicked_node(event.offsetX,event.offsetY);
+
+            if(collided_id != -1){
+                if(connectionPair.starting_node == -1){
+                    // This means that it is the first node that was clicked
+                connectionPair.starting_node = collided_id;
+                }else if( connectionPair.ending_node == -1){
+                    // This means that it is the second node that was clicked
+                    connectionPair.ending_node = collided_id;
+                    create_connection(connectionPair.starting_node,connectionPair.ending_node,connectionPair.associated_letter);
+                } else{
+                    // In this case, we need to reset the previous connection to establish the new one
+                    connectionPair = {starting_node: collided_id, ending_node: -1, associated_letter: "-1"}
+                }
 
     }
 
+}
 }
 
     // If several nodes collide only the latest node in the array will be deleted
@@ -90,7 +109,7 @@ export function handleCanvasClick(e:Event){
             }
 
         });
-       return collided_id;
+    return collided_id;
     }
 export function create_node(x:number,y:number){
     let new_node_info:node_props = {id:node_id, pos_x: x, pos_y: y, connections:[]};
@@ -121,4 +140,22 @@ export function delete_node(id:number){
 function resetAllButtonSignals(){
     is_add_tool_active.value = false;
     is_delete_tool_active.value = false;
+}
+
+function create_connection(starting_node:number,end_node:number,my_letter:string){
+
+    // We know that the passed ids exist therefore, we just perform a for each
+    nodes.value.forEach((node)=>{
+        if(node.id == starting_node){
+            let myConnection = {ending_node: end_node,associated_letter:my_letter};
+            node.connections =  [...node.connections, myConnection];
+            // We update the reference so that the update is noticed by the engine
+            nodes.value = [...nodes.value];
+        }
+    })
+
+    nodes.value.forEach((node)=>{
+        console.log(node);
+    })
+
 }

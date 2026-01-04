@@ -7,4 +7,4 @@ Preact application that simulates Finite Automaton
         - Delete node -> red colour
         - None selected -> default cursor
     
-    2. For connections use LineTo and update the arrows when the nodes are moved
+    2. For connections use LineTo and update the arrows when the nodes are moved. To implement functionality in draw_canvas method
