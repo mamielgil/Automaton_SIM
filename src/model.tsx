@@ -19,8 +19,11 @@ export type connection_props = {
 export let nodes = signal<node_props[]>([]);
 
 let node_id:number = 0;
+export const show_connection_popup = signal(false);
+
 const is_add_tool_active = signal(false);
 const is_delete_tool_active = signal(false);
+const is_connections_tool_active = signal(false);
 
 export function changeAddMode(){
     // We change the AddMode value alternatively
@@ -29,6 +32,17 @@ export function changeAddMode(){
     is_add_tool_active.value = !previous_add;
     
 
+}
+
+export function changeConnectionMode(){
+    let previous_connection_status = is_connections_tool_active.value;
+    resetAllButtonSignals();
+    is_connections_tool_active.value = !previous_connection_status;
+    if(is_connections_tool_active.value){
+        // IF the value is true, we activate the pop up
+        show_connection_popup.value = true;
+        setTimeout(()=>{show_connection_popup.value = false;},2000);
+    }
 }
 
 export function changeDeleteMode(){
@@ -48,7 +62,13 @@ export function handleCanvasClick(e:Event){
         create_node(event.offsetX,event.offsetY);
     }
     else if(is_delete_tool_active.value){
-        find_clicked_node(event.offsetX,event.offsetY); 
+        let collided_id = find_clicked_node(event.offsetX,event.offsetY); 
+        if(collided_id != -1){
+            // This means that the hitTest yielded true for some node
+            delete_node(collided_id);
+        }
+
+    } else if( is_connections_tool_active.value){
 
     }
 
@@ -70,10 +90,7 @@ export function handleCanvasClick(e:Event){
             }
 
         });
-        if(collided_id != -1){
-            // This means that the hitTest yielded true for some node
-            delete_node(collided_id);
-        }
+       return collided_id;
     }
 export function create_node(x:number,y:number){
     let new_node_info:node_props = {id:node_id, pos_x: x, pos_y: y, connections:[]};

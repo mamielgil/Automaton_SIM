@@ -1,7 +1,6 @@
 import { useLayoutEffect, useRef } from "preact/hooks";
 import * as Model from "../model"
 import Node from "../Node";
-import { effect } from "@preact/signals";
 
 export function Canvas(){
 
@@ -19,19 +18,19 @@ export function Canvas(){
     }
 
     
-
     useLayoutEffect(()=>{
-    let containerRef = canvasRef.current as HTMLElement;
-    let canvas_observer = new ResizeObserver(resizeCanvas);
-    canvas_observer.observe(containerRef);
-    const updatingNodes = effect(() => draw_canvas());
+        let containerRef = canvasRef.current as HTMLElement;
+        let canvas_observer = new ResizeObserver(resizeCanvas);
+        canvas_observer.observe(containerRef);
 
-    // We invoke the cleanup function once the Canvas is not used anymore
-    return ()=> {
-        updatingNodes();
-        canvas_observer.disconnect();
-    };
-    },[]); 
+        // We invoke the cleanup function to eliminate the observer
+        // once the canvas ceases to exist
+        return ()=> canvas_observer.disconnect();
+    },[])
+    useLayoutEffect(()=>{
+        draw_canvas();
+
+},[Model.nodes.value]);
 
     function draw_canvas(){
         

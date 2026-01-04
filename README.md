@@ -6,3 +6,5 @@ Preact application that simulates Finite Automaton
         - Add node -> light green colour
         - Delete node -> red colour
         - None selected -> default cursor
+    
+    2. For connections use LineTo and update the arrows when the nodes are moved
