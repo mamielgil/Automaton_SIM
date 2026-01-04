@@ -17,7 +17,7 @@ export default class Node{
         // We now draw all the elements that form the node
 
         gc.beginPath();
-        gc.arc(this.my_x,this.my_y,10,0,2 * Math.PI);
+        gc.arc(this.my_x,this.my_y,25,0,2 * Math.PI);
         gc.closePath();
         gc.fillStyle = "yellow";
         gc.fill();

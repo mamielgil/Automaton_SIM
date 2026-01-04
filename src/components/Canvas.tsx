@@ -1,25 +1,45 @@
 import { useLayoutEffect, useRef } from "preact/hooks";
 import * as Model from "../model"
 import Node from "../Node";
+import { effect } from "@preact/signals";
 
 export function Canvas(){
 
     let canvasRef = useRef<HTMLCanvasElement>(null);
-    
-    useLayoutEffect(()=>{
-        // We only draw the nodes if the canvas is displayed on the screen
-        console.log("layout Effect is called")
-        let gc = canvasRef.current?.getContext("2d");
-        if(gc){
-        draw_canvas(gc);
-        }
-    },[Model.nodes.value]);
+    let containerRef = useRef<HTMLDivElement>(null);
+       // We define a method to resize the Canvas
+    function resizeCanvas(){
 
-    function draw_canvas(gc:CanvasRenderingContext2D){
+        // We update the size everytime
+        const my_canvas = canvasRef.current as HTMLCanvasElement;
+        let new_dimensions = my_canvas.getBoundingClientRect();
+        my_canvas.width = new_dimensions.width;
+        my_canvas.height = new_dimensions.height;
+        draw_canvas();
+    }
+
+    
+
+    useLayoutEffect(()=>{
+    let containerRef = canvasRef.current as HTMLElement;
+    let canvas_observer = new ResizeObserver(resizeCanvas);
+    canvas_observer.observe(containerRef);
+    const updatingNodes = effect(() => draw_canvas());
+
+    // We invoke the cleanup function once the Canvas is not used anymore
+    return ()=> {
+        updatingNodes();
+        canvas_observer.disconnect();
+    };
+    },[]); 
+
+    function draw_canvas(){
         
+        
+        let gc = canvasRef.current?.getContext("2d");
         let my_canvas = canvasRef.current as HTMLCanvasElement;
-        my_canvas.width = my_canvas.clientWidth;;
-        my_canvas.height = my_canvas.clientHeight;
+        if(gc){
+
         gc.save();
         gc.fillStyle = "oklch(0.707 0.022 261.325)";
         gc.fillRect(0,0,my_canvas.width,my_canvas.height);
@@ -32,10 +52,11 @@ export function Canvas(){
             new_node.draw(gc);
             
         });
+        }
     }
     return(
-        <div class =  "flex bg-gray-400 grow ml-[5px] mr-[5px] mb-[5px] border">
-        <canvas class = "grow" ref = {canvasRef} onClick = {Model.handleCanvasClick}> </canvas>
+        <div ref = {containerRef} class =  "flex grow box-border pl-[5px] pr-[5px] pb-[5px] min-h-0">
+        <canvas class = "border bg-gray-400 w-full h-full grow" ref = {canvasRef} onClick = {Model.handleCanvasClick}> </canvas>
         </div>
 
     );

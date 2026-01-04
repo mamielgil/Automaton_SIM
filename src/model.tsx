@@ -18,7 +18,7 @@ export type connection_props = {
 export let nodes = signal<node_props[]>([]);
 
 let node_id:number = 0;
-let is_Add_Tool_Active = signal(false);
+export const is_Add_Tool_Active = signal(false);
 
 export function changeAddMode(){
     // We change the AddMode value alternatively
@@ -31,11 +31,11 @@ export function handleCanvasClick(e:Event){
     console.log(is_Add_Tool_Active.value);
     if(is_Add_Tool_Active.value){
         let event = e as MouseEvent;
-        create_node(event.x,event.y);
+        create_node(event.offsetX,event.offsetY);
     }
 }
 
-function create_node(x:number,y:number){
+export function create_node(x:number,y:number){
     let new_node_info:node_props = {id:node_id, pos_x: x, pos_y: y, connections:[]};
     // We increase the node id so that all nodes have a different id
     node_id++;
