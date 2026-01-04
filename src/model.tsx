@@ -41,6 +41,8 @@ export function changeDeleteMode(){
 export function handleCanvasClick(e:Event){
     let event = e as MouseEvent;
     
+    // We determine which signal is active and depending on that
+    // we perform a specific action
     if(is_add_tool_active.value){
         
         create_node(event.offsetX,event.offsetY);
