@@ -84,12 +84,14 @@ function handle_no_option(event:MouseEvent){
         change_node_color(collided_id);
     }
 }
+
 export function handleToolbarClick(e:Event){
     if(e.target === e.currentTarget){
         resetAllButtonSignals();
     }
 
 }
+
 function handle_connection_option(event:MouseEvent){
 
     // We determine if we selected one node to create the connection
@@ -102,6 +104,7 @@ function handle_connection_option(event:MouseEvent){
                 connectionPair.starting_node = collided_id;
                 // To identify that this node was selected, we are going to change its color
                 change_node_color(collided_id);
+
                 }else if( connectionPair.ending_node == -1){
                     // This means that it is the second node that was clicked
                     connectionPair.ending_node = collided_id;
@@ -115,6 +118,7 @@ function handle_connection_option(event:MouseEvent){
 
                     // We set the clicked node to a different color so that the user knows that it was selected
                     change_node_color(collided_id);
+ 
                 }
             
             
@@ -122,6 +126,23 @@ function handle_connection_option(event:MouseEvent){
     }
 }
 
+function change_node_pos(collided_id:number,transl_x:number,transl_y:number){
+
+    // We go through all the nodes and change its coordinates to the one of the translated event
+
+    nodes.value.forEach((node)=>{
+
+        if(node.id == collided_id){
+            // If the id matches, we update the coordinates
+            node.pos_x = transl_x;
+            node.pos_y = transl_y;
+        }
+    });
+
+    // We update the signal reference so the components are rerendered
+
+    nodes.value = [...nodes.value];
+}
 
 function change_node_color(collided_id:number){
 
