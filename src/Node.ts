@@ -1,4 +1,3 @@
-import { computed } from "@preact/signals";
 import { type node_props, type connection_props} from "./model";
 import * as Model from "./model";
 export default class Node{
@@ -83,7 +82,12 @@ export default class Node{
         // by the ending_distance
 
         let normalized_vector = {x:vector_joining_points.x / distance, y:vector_joining_points.y / distance};
-        let return_values = {initial_x: starting_x + normalized_vector.x * Model.NODE_RADIUS, initial_y: starting_y + normalized_vector.y * Model.NODE_RADIUS,final_x:starting_x + normalized_vector.x * ending_distance, final_y:starting_y + normalized_vector.y * ending_distance};
+        let initial_x = starting_x + normalized_vector.x * Model.NODE_RADIUS;
+        let initial_y = starting_y + normalized_vector.y * Model.NODE_RADIUS;
+        let final_x = starting_x + normalized_vector.x * ending_distance;
+        let final_y = starting_y + normalized_vector.y * ending_distance;
+
+        let return_values = {initial_x: initial_x , initial_y: initial_y ,final_x:final_x, final_y:final_y};
         return return_values;
 
     }
