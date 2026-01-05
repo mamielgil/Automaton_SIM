@@ -60,8 +60,8 @@ export default class Node{
             gc.lineTo(computed_values.final_x,computed_values.final_y);
 
             // We call a method that allows to draw the line in the outer bound of the node
-            let middle_point_x = computed_values.initial_x + computed_values.unit_vector.x * (computed_values.distance / 2)
-            let middle_point_y = computed_values.initial_y + computed_values.unit_vector.y * (computed_values.distance/ 2);
+            let middle_point_x = this.my_x + computed_values.unit_vector.x * (computed_values.distance / 2)
+            let middle_point_y = this.my_y + computed_values.unit_vector.y * (computed_values.distance/ 2);
 
             gc.strokeText(connection.associated_letter,middle_point_x - 5, middle_point_y - 5);
             gc.stroke();
