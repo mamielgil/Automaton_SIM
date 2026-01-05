@@ -29,18 +29,17 @@ const is_connections_tool_active = signal(false);
 let connectionPair  = {starting_node : -1 , ending_node: -1, associated_letter: "-1" };
 
 export function changeAddMode(){
-    // We change the AddMode value alternatively
-    let previous_add = is_add_tool_active.value;
+
     resetAllButtonSignals();
-    is_add_tool_active.value = !previous_add;
+    is_add_tool_active.value = true;
     
 
 }
 
 export function changeConnectionMode(){
-    let previous_connection_status = is_connections_tool_active.value;
+
     resetAllButtonSignals();
-    is_connections_tool_active.value = !previous_connection_status;
+    is_connections_tool_active.value = true;
     if(is_connections_tool_active.value){
         // IF the value is true, we activate the pop up
         show_connection_popup.value = true;
@@ -49,9 +48,9 @@ export function changeConnectionMode(){
 }
 
 export function changeDeleteMode(){
-    let previous_delete = is_delete_tool_active.value;
+    
     resetAllButtonSignals();
-    is_delete_tool_active.value = !previous_delete;
+    is_delete_tool_active.value = true;
 
 }
 
