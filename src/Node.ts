@@ -11,7 +11,7 @@ export default class Node{
         this.myconnections = connections;
     }
 
-    draw(gc:CanvasRenderingContext2D){
+    draw(gc:CanvasRenderingContext2D,selected:boolean){
         // We now draw the circle with its corresponding information
         gc.save();
         // We now draw all the elements that form the node
@@ -19,7 +19,11 @@ export default class Node{
         gc.beginPath();
         gc.arc(this.my_x,this.my_y,NODE_RADIUS,0,2 * Math.PI);
         gc.closePath();
+        if(!selected){
         gc.fillStyle = "yellow";
+        }else{
+            gc.fillStyle = "orange";
+        }
         gc.fill();
 
         gc.strokeStyle = "black";

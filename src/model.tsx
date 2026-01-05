@@ -6,6 +6,7 @@ export type node_props = {
     id:number;
     pos_x:number;
     pos_y:number;
+    selected:boolean;
     connections: connection_props[];
 }
 
@@ -64,32 +65,80 @@ export function handleCanvasClick(e:Event){
         create_node(event.offsetX,event.offsetY);
     }
     else if(is_delete_tool_active.value){
-        let collided_id = find_clicked_node(event.offsetX,event.offsetY); 
+        handle_delete_option(e as MouseEvent);
+
+    } else if( is_connections_tool_active.value){
+
+        
+        handle_connection_option(e as MouseEvent);
+}
+}
+
+function handle_connection_option(event:MouseEvent){
+
+    // We determine if we selected one node to create the connection
+        let collided_id = find_clicked_node(event.offsetX,event.offsetY);
+
+            if(collided_id != -1){
+                if(connectionPair.starting_node == -1){
+                    reset_node_selection();
+                    // This means that it is the first node that was clicked
+                connectionPair.starting_node = collided_id;
+                // To identify that this node was selected, we are going to change its color
+                change_node_color(collided_id);
+                }else if( connectionPair.ending_node == -1){
+                    // This means that it is the second node that was clicked
+                    connectionPair.ending_node = collided_id;
+                    create_connection(connectionPair.starting_node,connectionPair.ending_node,connectionPair.associated_letter);
+                    reset_node_selection();
+
+                } else{
+                    // In this case, we need to reset the previous connection to establish the new one
+                    connectionPair = {starting_node: collided_id, ending_node: -1, associated_letter: "-1"}
+
+
+                    // We set the clicked node to a different color so that the user knows that it was selected
+                    change_node_color(collided_id);
+                }
+            
+            
+
+    }
+}
+
+
+function change_node_color(collided_id:number){
+
+    // Changing the color is changing its selection state so that it has a different color
+    nodes.value.forEach((node)=>{
+        if(node.id === collided_id){
+            node.selected = true;
+
+        }
+    });
+
+    // We change the signal reference so that the rerender is triggered
+    nodes.value = [...nodes.value];
+
+}
+
+function reset_node_selection(){
+
+    // This method resets all nodes to non selected
+    nodes.value.forEach((node)=>{
+        node.selected = false;
+    });
+    // We change the reference so that a rerender is triggered
+    nodes.value = [...nodes.value];
+}
+function handle_delete_option(event:MouseEvent){
+
+    let collided_id = find_clicked_node(event.offsetX,event.offsetY); 
         if(collided_id != -1){
             // This means that the hitTest yielded true for some node
             delete_node(collided_id);
         }
 
-    } else if( is_connections_tool_active.value){
-        // We determine if we selected one node to create the connection
-        let collided_id = find_clicked_node(event.offsetX,event.offsetY);
-
-            if(collided_id != -1){
-                if(connectionPair.starting_node == -1){
-                    // This means that it is the first node that was clicked
-                connectionPair.starting_node = collided_id;
-                }else if( connectionPair.ending_node == -1){
-                    // This means that it is the second node that was clicked
-                    connectionPair.ending_node = collided_id;
-                    create_connection(connectionPair.starting_node,connectionPair.ending_node,connectionPair.associated_letter);
-                } else{
-                    // In this case, we need to reset the previous connection to establish the new one
-                    connectionPair = {starting_node: collided_id, ending_node: -1, associated_letter: "-1"}
-                }
-
-    }
-
-}
 }
 
     // If several nodes collide only the latest node in the array will be deleted
@@ -111,7 +160,7 @@ export function handleCanvasClick(e:Event){
     return collided_id;
     }
 export function create_node(x:number,y:number){
-    let new_node_info:node_props = {id:node_id, pos_x: x, pos_y: y, connections:[]};
+    let new_node_info:node_props = {id:node_id, pos_x: x, pos_y: y, selected:false,connections:[]};
     // We increase the node id so that all nodes have a different id
     node_id++;
 

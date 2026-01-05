@@ -48,7 +48,7 @@ export function Canvas(){
             let new_node = new Node(node);
             // Each render, we create new nodes after having deleted
             // the previous ones
-            new_node.draw(gc);
+            new_node.draw(gc,node.selected);
             
         });
 
