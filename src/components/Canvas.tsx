@@ -48,13 +48,12 @@ export function Canvas(){
             let new_node = new Node(node);
             // Each render, we create new nodes after having deleted
             // the previous ones
-            new_node.draw(gc,node.selected);
+            new_node.draw(gc);
+            new_node.draw_connections(gc);
+            
             
         });
-
-        // Once all the nodes have been drawn we need to draw the connections
-        // TO DO LATER.....
-        }
+    }
     }
     return(
         <div ref = {containerRef} class =  "flex grow box-border pl-[5px] pr-[5px] pb-[5px] min-h-0">

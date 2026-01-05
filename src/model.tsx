@@ -32,6 +32,7 @@ let connectionPair  = {starting_node : -1 , ending_node: -1, associated_letter: 
 export function changeAddMode(){
 
     resetAllButtonSignals();
+    
     is_add_tool_active.value = true;
     
 
@@ -203,6 +204,7 @@ export function delete_node(id:number){
 function resetAllButtonSignals(){
     is_add_tool_active.value = false;
     is_delete_tool_active.value = false;
+    is_connections_tool_active.value = false;
 }
 
 function create_connection(starting_node:number,end_node:number,my_letter:string){
