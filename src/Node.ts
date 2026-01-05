@@ -56,14 +56,18 @@ export default class Node{
 
             let ending_node_credentials = Model.nodes.value.filter((node)=> node.id === connection.ending_node)[0];
             let computed_values = this.compute_starting_ending_point_connection(this.my_x,this.my_y,ending_node_credentials.pos_x,ending_node_credentials.pos_y);
+            gc.beginPath();
             gc.moveTo(computed_values.initial_x,computed_values.initial_y);
             gc.lineTo(computed_values.final_x,computed_values.final_y);
+
             // We call a method that allows to draw the line in the outer bound of the node
             let middle_point_x = computed_values.initial_x + computed_values.unit_vector.x * (computed_values.distance / 2)
             let middle_point_y = computed_values.initial_y + computed_values.unit_vector.y * (computed_values.distance/ 2);
 
             gc.strokeText(connection.associated_letter,middle_point_x - 5, middle_point_y - 5);
             gc.stroke();
+            gc.closePath();
+            this.draw_arrow_head(gc, computed_values.initial_x, computed_values.initial_y, computed_values.final_x, computed_values.final_y);
             gc.restore();
         })
 
@@ -83,7 +87,7 @@ export default class Node{
         let ending_distance = distance - Model.NODE_RADIUS;
 
         // The ending point of the line will be obtained by normalizing the vector and then multiplying it
-        // by the ending_distance
+        // by the ending_distance. We add the initial point as it is where we started from
 
         let normalized_vector = {x:vector_joining_points.x / distance, y:vector_joining_points.y / distance};
         let initial_x = starting_x + normalized_vector.x * Model.NODE_RADIUS;
@@ -94,6 +98,35 @@ export default class Node{
         let return_values = {initial_x: initial_x , initial_y: initial_y ,final_x:final_x, final_y:final_y,line_vector:vector_joining_points,distance:distance,unit_vector: normalized_vector};
         return return_values;
 
+    }
+
+    draw_arrow_head(gc: CanvasRenderingContext2D, start_x: number, start_y: number, end_x: number, end_y: number) {
+        
+        gc.save();
+        gc.strokeStyle = "black";
+
+        // I establish a random length for the arrow head
+        let head_length = 10;
+
+        // We compute the angle that the line forms by using the arctg
+        let angle = Math.atan2(end_y - start_y, end_x - start_x);
+
+        gc.beginPath();
+        gc.moveTo(end_x, end_y);
+        
+        // Calculate the first wing (angle - 30 degrees)
+        // I have chosen 30 degress as it is the one that visually seem more beuatiful
+        // We subtract the angle to point "backwards" from the tip
+        gc.lineTo(end_x - head_length * Math.cos(angle - Math.PI / 6), end_y - head_length * Math.sin(angle - Math.PI / 6));
+
+        gc.moveTo(end_x, end_y);
+        
+        // Calculate the second wing (angle + 30 degrees)
+        gc.lineTo(end_x - head_length * Math.cos(angle + Math.PI / 6), end_y - head_length * Math.sin(angle + Math.PI / 6));
+
+        gc.stroke();
+        gc.closePath();
+        gc.restore();
     }
 
 
