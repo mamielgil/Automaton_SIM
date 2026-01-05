@@ -22,9 +22,9 @@ export let nodes = signal<node_props[]>([]);
 let node_id:number = 0;
 export const show_connection_popup = signal(false);
 
-const is_add_tool_active = signal(false);
-const is_delete_tool_active = signal(false);
-const is_connections_tool_active = signal(false);
+export const is_add_tool_active = signal(false);
+export const is_delete_tool_active = signal(false);
+export const is_connections_tool_active = signal(false);
 
 // This array will store the connection that needs to be created
 let connectionPair  = {starting_node : -1 , ending_node: -1, associated_letter: "-1" };
@@ -71,9 +71,24 @@ export function handleCanvasClick(e:Event){
 
         
         handle_connection_option(e as MouseEvent);
-}
+    }else{
+        handle_no_option(e as MouseEvent);
+    }
 }
 
+function handle_no_option(event:MouseEvent){
+    let collided_id = find_clicked_node(event.offsetX,event.offsetY);
+    reset_node_selection();
+    if(collided_id != -1){
+        change_node_color(collided_id);
+    }
+}
+export function handleToolbarClick(e:Event){
+    if(e.target === e.currentTarget){
+        resetAllButtonSignals();
+    }
+
+}
 function handle_connection_option(event:MouseEvent){
 
     // We determine if we selected one node to create the connection
