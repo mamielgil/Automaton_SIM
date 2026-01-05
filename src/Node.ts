@@ -1,3 +1,4 @@
+import { computed } from "@preact/signals";
 import { type node_props, type connection_props} from "./model";
 import * as Model from "./model";
 export default class Node{
@@ -58,7 +59,10 @@ export default class Node{
             gc.moveTo(computed_values.initial_x,computed_values.initial_y);
             gc.lineTo(computed_values.final_x,computed_values.final_y);
             // We call a method that allows to draw the line in the outer bound of the node
-            
+            let middle_point_x = computed_values.initial_x + computed_values.unit_vector.x * (computed_values.distance / 2)
+            let middle_point_y = computed_values.initial_y + computed_values.unit_vector.y * (computed_values.distance/ 2);
+
+            gc.strokeText(connection.associated_letter,middle_point_x - 5, middle_point_y - 5);
             gc.stroke();
             gc.restore();
         })
@@ -87,7 +91,7 @@ export default class Node{
         let final_x = starting_x + normalized_vector.x * ending_distance;
         let final_y = starting_y + normalized_vector.y * ending_distance;
 
-        let return_values = {initial_x: initial_x , initial_y: initial_y ,final_x:final_x, final_y:final_y};
+        let return_values = {initial_x: initial_x , initial_y: initial_y ,final_x:final_x, final_y:final_y,line_vector:vector_joining_points,distance:distance,unit_vector: normalized_vector};
         return return_values;
 
     }
