@@ -98,7 +98,7 @@ export function handleCanvasDrag(e:Event){
     }
     let translated_event = drag_translator.translate_event(event);
     if(translated_event.type == "drag"){
-        change_node_pos(to_drag_node.value,translated_event.x,translated_event.y);
+        change_node_pos(event.target as HTMLElement,to_drag_node.value,translated_event.x,translated_event.y);
     }
     }
 
@@ -154,16 +154,18 @@ function handle_connection_option(event:MouseEvent){
 }
 
 
-function change_node_pos(collided_id:number,transl_x:number,transl_y:number){
+function change_node_pos(event_target:HTMLElement,collided_id:number,transl_x:number,transl_y:number){
 
     // We go through all the nodes and change its coordinates to the one of the translated event
 
     nodes.value.forEach((node)=>{
 
+        // If the id matches, we update the coordinates
         if(node.id == collided_id){
-            // If the id matches, we update the coordinates
-            node.pos_x = transl_x;
-            node.pos_y = transl_y - 2 * NODE_RADIUS;
+            // We adjust the global coordinates to the local coordinates of the canvas
+            let coordinates_bias = event_target.getBoundingClientRect();
+            node.pos_x = transl_x - coordinates_bias.left;
+            node.pos_y = transl_y - coordinates_bias.top;
         }
     });
 
