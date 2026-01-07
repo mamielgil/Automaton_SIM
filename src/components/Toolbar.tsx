@@ -7,6 +7,7 @@ export default function Toolbar(){
         <MenuOption onClickHandler={Model.changeConnectionMode} stringLabel= "Add connection" checked = {Model.is_connections_tool_active.value}></MenuOption>
         <MenuOption onClickHandler={Model.changeAddMode} stringLabel="Add Tool" checked = {Model.is_add_tool_active.value}></MenuOption>
         <MenuOption onClickHandler={Model.changeDeleteMode} stringLabel="Delete Tool" checked = {Model.is_delete_tool_active.value}></MenuOption>
+        <MenuOption stringLabel="Edit Node Tool" onClickHandler={Model.changeEditMode} checked = {Model.is_edit_tool_active.value}></MenuOption>
         <button class = "ml-[15px] w-[100px]"> Save</button>
         </div>
 

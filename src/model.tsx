@@ -27,6 +27,7 @@ export const show_connection_popup = signal(false);
 export const is_add_tool_active = signal(false);
 export const is_delete_tool_active = signal(false);
 export const is_connections_tool_active = signal(false);
+export const is_edit_tool_active = signal(false);
 export const num_nodes_selected = computed(()=>{
 
     // We return the number of nodes that are in their selected state
@@ -46,7 +47,7 @@ export function changeAddMode(){
 
 }
 export function noOptionActive(){
-    return !is_add_tool_active.value && !is_delete_tool_active.value && !is_connections_tool_active.value;
+    return !is_add_tool_active.value && !is_delete_tool_active.value && !is_connections_tool_active.value && !is_edit_tool_active.value;
 }
 export function changeConnectionMode(){
 
@@ -63,7 +64,13 @@ export function changeDeleteMode(){
     
     resetAllButtonSignals();
     is_delete_tool_active.value = true;
+    
 
+}
+
+export function changeEditMode(){
+    resetAllButtonSignals();
+    is_edit_tool_active.value = true;
 }
 
 export function handleCanvasClick(e:Event){
@@ -263,6 +270,7 @@ function resetAllButtonSignals(){
     is_add_tool_active.value = false;
     is_delete_tool_active.value = false;
     is_connections_tool_active.value = false;
+    is_edit_tool_active.value = false;
 }
 
 function create_connection(starting_node:number,end_node:number,my_letter:string){
