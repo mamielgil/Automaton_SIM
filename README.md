@@ -7,4 +7,5 @@ Preact application that simulates Finite Automaton
         - Delete node -> red colour
         - None selected -> default cursor
     
-    2. Develop special connection when connection is a loop, in other words, a node is connected to itself.
+    2. Being able to change letter of the connection
+    3. Controlling in Finite Automaton that we do not have connections with the same letter, departing from the same node.(DFA vs NFA).

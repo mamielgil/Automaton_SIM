@@ -1,4 +1,4 @@
-import {signal} from "@preact/signals"
+import {signal,computed} from "@preact/signals"
 import { DragTranslator } from "./Drag_translator";
 
 export const NODE_RADIUS = 25;
@@ -26,6 +26,12 @@ export const show_connection_popup = signal(false);
 export const is_add_tool_active = signal(false);
 export const is_delete_tool_active = signal(false);
 export const is_connections_tool_active = signal(false);
+export const num_nodes_selected = computed(()=>{
+
+    // We return the number of nodes that are in their selected state
+    return nodes.value.filter((node)=>node.selected === true).length;
+
+});
 
 // This array will store the connection that needs to be created
 let connectionPair  = {starting_node : -1 , ending_node: -1, associated_letter: "-1" };
@@ -38,7 +44,7 @@ export function changeAddMode(){
     
 
 }
-function noOptionActive(){
+export function noOptionActive(){
     return !is_add_tool_active.value && !is_delete_tool_active.value && !is_connections_tool_active.value;
 }
 export function changeConnectionMode(){
