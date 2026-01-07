@@ -20,6 +20,7 @@ export default class Node{
     draw(gc:CanvasRenderingContext2D){
         // We now draw the circle with its corresponding information
         gc.save();
+        
         // We now draw all the elements that form the node
 
         gc.beginPath();
@@ -38,7 +39,8 @@ export default class Node{
         gc.fillStyle = "black";
         let myString = this.name;
         let myStringHeight = gc.measureText(myString).fontBoundingBoxAscent + gc.measureText(myString).fontBoundingBoxDescent;
-        gc.fillText(myString,this.my_x - 0.5 * gc.measureText(myString).width,this.my_y + 0.4 * myStringHeight);
+        gc.font = "12px sans-serif";
+        gc.strokeText(myString,this.my_x - 0.5 * gc.measureText(myString).width,this.my_y + 0.4 * myStringHeight);
         gc.restore();
     }
 
@@ -51,6 +53,7 @@ export default class Node{
             gc.save();
             gc.lineWidth = 1;
             gc.strokeStyle = "black";
+            gc.font = "14px sans-serif";
 
             if(connection.ending_node != this.my_id){
             
@@ -62,7 +65,7 @@ export default class Node{
                 this.draw_cycle_connection(gc,connection);
             }
             
-           
+           gc.restore();
         })
 
     }
@@ -70,7 +73,7 @@ export default class Node{
 
     draw_to_other_node_connection(gc:CanvasRenderingContext2D,connection:connection_props){
          
-            
+            gc.save();
             // We now find the credentials of the ending node(we take the first element though there is always
             // going to be a single node that is returned in the filter function)
 

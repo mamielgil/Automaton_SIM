@@ -40,10 +40,10 @@ export const num_nodes_selected = computed(()=>{
 let connectionPair  = {starting_node : -1 , ending_node: -1, associated_letter: "-1" };
 
 export function changeAddMode(){
-
+    let previous_add = is_add_tool_active.value;
     resetAllButtonSignals();
     
-    is_add_tool_active.value = true;
+    is_add_tool_active.value = !previous_add;
     
 
 }
@@ -51,9 +51,10 @@ export function noOptionActive(){
     return !is_add_tool_active.value && !is_delete_tool_active.value && !is_connections_tool_active.value && !is_edit_tool_active.value;
 }
 export function changeConnectionMode(){
-
+    let previous_connection_mode = is_connections_tool_active.value;
     resetAllButtonSignals();
-    is_connections_tool_active.value = true;
+    is_connections_tool_active.value = !previous_connection_mode;
+
     if(is_connections_tool_active.value){
         // IF the value is true, we activate the pop up
         show_connection_popup.value = true;
@@ -62,16 +63,17 @@ export function changeConnectionMode(){
 }
 
 export function changeDeleteMode(){
-    
+    let previous_delete = is_delete_tool_active.value;
     resetAllButtonSignals();
-    is_delete_tool_active.value = true;
+    is_delete_tool_active.value = !previous_delete;
     
 
 }
 
 export function changeEditMode(){
+    let previous_edit = is_edit_tool_active.value;
     resetAllButtonSignals();
-    is_edit_tool_active.value = true;
+    is_edit_tool_active.value = !previous_edit;
 }
 
 export function handleCanvasClick(e:Event){

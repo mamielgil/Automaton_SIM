@@ -7,5 +7,7 @@ Preact application that simulates Finite Automaton
         - Delete node -> red colour
         - None selected -> default cursor
     
-    2. Being able to change letter of the connection
-    3. Controlling in Finite Automaton that we do not have connections with the same letter, departing from the same node.(DFA vs NFA).
+    2. Force properties from DFA or NFA depending on what
+    automaton type was selected
+
+    3.Develop automatic and step by step word analysis
