@@ -8,5 +8,3 @@ Preact application that simulates Finite Automaton
         - None selected -> default cursor
     
     2. Develop special connection when connection is a loop, in other words, a node is connected to itself.
-
-    3. Add drag logic in the model by using the drag translator

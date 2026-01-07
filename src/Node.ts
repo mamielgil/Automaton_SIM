@@ -48,8 +48,26 @@ export default class Node{
             gc.save();
             gc.lineWidth = 1;
             gc.strokeStyle = "black";
-            
 
+            if(connection.ending_node != this.my_id){
+            
+                // This is the way to draw the connections as long as it is with another node
+                this.draw_to_other_node_connection(gc,connection);
+
+            }else{
+                // This method draws the connections that a node has to itself
+                this.draw_cycle_connection(gc,connection);
+            }
+            
+           
+        })
+
+    }
+
+
+    draw_to_other_node_connection(gc:CanvasRenderingContext2D,connection:connection_props){
+         
+            
             // We now find the credentials of the ending node(we take the first element though there is always
             // going to be a single node that is returned in the filter function)
 
@@ -67,11 +85,33 @@ export default class Node{
             gc.stroke();
             gc.closePath();
             this.draw_arrow_head(gc, computed_values.initial_x, computed_values.initial_y, computed_values.final_x, computed_values.final_y);
+            
             gc.restore();
-        })
+    }
+    draw_cycle_connection(gc:CanvasRenderingContext2D,connection_data:connection_props){
+
+        gc.save();
+        gc.strokeStyle = "black";
+        gc.beginPath();
+        // We represent the cycle as an ellipse so that it can be distinguished more easily
+        gc.ellipse(this.my_x,this.my_y- Model.NODE_RADIUS + 5,Model.NODE_RADIUS / 2, Model.NODE_RADIUS ,Math.PI,0,Math.PI);
+        gc.stroke();
+        gc.closePath();
+
+        // We draw the arrow heads to indicate the direction of the connection
+        this.draw_arrow_head(gc,this.my_x,this.my_y- 2 * Model.NODE_RADIUS,this.my_x + Model.NODE_RADIUS / 2 + 2,this.my_y - Model.NODE_RADIUS + 5);
+
+        // We draw the label that characterizes this particular connection
+
+        // We center the text by removing half of its width to the coordinate x
+        let label_x = this.my_x - gc.measureText(connection_data.associated_letter).width / 2;
+
+        // We draw it on top of the connection
+        let label_y = this.my_y - 2 * Model.NODE_RADIUS - 5;
+        gc.strokeText(connection_data.associated_letter,label_x,label_y);
+        gc.restore();
 
     }
-
 
     compute_starting_ending_point_connection(starting_x:number,starting_y:number,ending_x:number,ending_y:number){
 
