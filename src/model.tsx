@@ -15,6 +15,7 @@ export type node_props = {
 export type connection_props = {
     // Specifies to which end node it is connected
     ending_node:number;
+    ending_name:string;
     // Letter that characterizes this transition
     associated_letter:string;
 
@@ -149,7 +150,8 @@ function handle_connection_option(event:MouseEvent){
                 }else if( connectionPair.ending_node == -1){
                     // This means that it is the second node that was clicked
                     connectionPair.ending_node = collided_id;
-                    create_connection(connectionPair.starting_node,connectionPair.ending_node,connectionPair.associated_letter);
+                    let credentials: node_props = find_node_credentials(collided_id);
+                    create_connection(connectionPair.starting_node,connectionPair.ending_node,credentials.name,connectionPair.associated_letter);
                     reset_node_selection();
 
                 } else{
@@ -167,6 +169,18 @@ function handle_connection_option(event:MouseEvent){
     }
 }
 
+export function find_node_credentials(node_id:number){
+
+    let credentials:node_props = {id:-1,name:"-1",pos_x:-1,pos_y:-1,selected:false,connections:[]};
+    nodes.value.forEach((node)=>{
+        if(node.id == node_id){
+            credentials = node;
+        }
+    });
+
+    return credentials;
+
+}
 
 function change_node_pos(event_target:HTMLElement,collided_id:number,transl_x:number,transl_y:number){
 
@@ -222,6 +236,7 @@ function handle_delete_option(event:MouseEvent){
 
 }
 
+
     // If several nodes collide only the latest node in the array will be deleted
     function find_clicked_node(clicked_x:number,clicked_y:number){
         // We go through all of the nodes and analyze if there was a node that was clicked
@@ -273,12 +288,12 @@ function resetAllButtonSignals(){
     is_edit_tool_active.value = false;
 }
 
-function create_connection(starting_node:number,end_node:number,my_letter:string){
+function create_connection(starting_node:number,end_node:number,end_name:string,my_letter:string){
 
     // We know that the passed ids exist therefore, we just perform a for each
     nodes.value.forEach((node)=>{
         if(node.id == starting_node){
-            let myConnection = {ending_node: end_node,associated_letter:my_letter};
+            let myConnection = {ending_node: end_node,ending_name:end_name,associated_letter:my_letter};
             node.connections =  [...node.connections, myConnection];
             // We update the reference so that the update is noticed by the engine
             nodes.value = [...nodes.value];
@@ -329,3 +344,26 @@ export function updateNodeId(e:Event,selected_id:number){
     nodes.value = [...nodes.value];
 
 }
+
+export function updateConnection(event: Event, node_id: number, ending_node_id: number, associated_letter: string) {
+    const inputField = event.target as HTMLInputElement;
+    const new_letter = inputField.value;
+
+    // We map through nodes to find the specific node, then map through its connections
+    nodes.value = nodes.value.map((node) => {
+        if (node.id === node_id) {
+            // Found the node, now update its connections
+            const updatedConnections = node.connections.map((conn) => {
+                // We identify the specific connection to update
+                // Note: Checking old_letter ensures we don't change other transitions to the same node if multiple exist
+                if (conn.ending_node === ending_node_id && conn.associated_letter === associated_letter) {
+                    return { ...conn, associated_letter: new_letter };
+                }
+                return conn;
+            });
+            return { ...node, connections: updatedConnections };
+        }
+        return node;
+    });
+}
+ 

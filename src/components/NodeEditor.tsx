@@ -19,8 +19,12 @@ export function NodeEditor(){
     }
     handle_editor_visibility();
     return(
-        isVisible ? <div class = "flex box-border w-[200px] bg-white pr-[5px] border min-h-0 p-[5px]">
-        <NodeEditorOption my_credentials={selected_node_data} ></NodeEditorOption>
+        isVisible ? <div class = "flex flex-col box-border w-[200px] bg-white pr-[5px] border min-h-0 p-[5px] gap-[10px]">
+        <NodeEditorOption my_label = {"Node name: "} my_credentials={selected_node_data} ></NodeEditorOption>
+        <label>Connections: </label>
+        {selected_node_data.connections.map((connection)=>{
+
+        })}
         
         </div> : null
 
