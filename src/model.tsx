@@ -29,6 +29,7 @@ export const is_add_tool_active = signal(false);
 export const is_delete_tool_active = signal(false);
 export const is_connections_tool_active = signal(false);
 export const is_edit_tool_active = signal(false);
+export const is_word_analysis_active = signal(false);
 export const num_nodes_selected = computed(()=>{
 
     // We return the number of nodes that are in their selected state
@@ -48,7 +49,7 @@ export function changeAddMode(){
 
 }
 export function noOptionActive(){
-    return !is_add_tool_active.value && !is_delete_tool_active.value && !is_connections_tool_active.value && !is_edit_tool_active.value;
+    return !is_add_tool_active.value && !is_delete_tool_active.value && !is_connections_tool_active.value && !is_edit_tool_active.value && !is_word_analysis_active.value;
 }
 export function changeConnectionMode(){
     let previous_connection_mode = is_connections_tool_active.value;
@@ -288,6 +289,7 @@ function resetAllButtonSignals(){
     is_delete_tool_active.value = false;
     is_connections_tool_active.value = false;
     is_edit_tool_active.value = false;
+    is_word_analysis_active.value = false;
 }
 
 function create_connection(starting_node:number,end_node:number,end_name:string,my_letter:string){
@@ -381,5 +383,13 @@ function verify_new_letter_connection(letter:string){
     }else{
         return true;
     }
+}
+
+
+export function activateWordAnalysis(){
+    // We activate the word analysis mode
+    let previous_is_analysis = is_word_analysis_active.value;
+    resetAllButtonSignals();
+    is_word_analysis_active.value = !previous_is_analysis;
 }
  

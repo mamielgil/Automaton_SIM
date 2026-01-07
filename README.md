@@ -11,3 +11,5 @@ Preact application that simulates Finite Automaton
     automaton type was selected
 
     3.Develop automatic and step by step word analysis
+
+    4. TO DO SOON -> PERFORM WORD ANALYSIS BY USING THE WORD ANALYSIS EDITOR
