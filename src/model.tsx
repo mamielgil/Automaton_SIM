@@ -5,6 +5,7 @@ export const NODE_RADIUS = 25;
 // This signal will store the current nodes of the automaton
 export type node_props = {
     id:number;
+    name:string;
     pos_x:number;
     pos_y:number;
     selected:boolean;
@@ -233,7 +234,7 @@ function handle_delete_option(event:MouseEvent){
     return collided_id;
     }
 export function create_node(x:number,y:number){
-    let new_node_info:node_props = {id:node_id, pos_x: x, pos_y: y, selected:false,connections:[]};
+    let new_node_info:node_props = {id:node_id,name: node_id.toString(), pos_x: x, pos_y: y, selected:false,connections:[]};
     // We increase the node id so that all nodes have a different id
     node_id++;
 
@@ -279,5 +280,44 @@ function create_connection(starting_node:number,end_node:number,my_letter:string
     nodes.value.forEach((node)=>{
         console.log(node);
     })
+
+}
+
+export function find_selected_credentials(){
+    if(num_nodes_selected.value === 1){
+
+        let found = false;
+        let index = 0;
+
+        while(!found){
+            if(nodes.value[index].selected){
+                // We set the control var to true so that the loop finishes
+                found = true;
+            }else{
+                // We keep searching within the nodes
+            index++;
+            }
+            
+        }
+        // We return the selected node
+        return nodes.value[index];
+    }else{
+        // We return a default "node" that allows us to know no node was detected
+        return {id:-1,name: "-1", pos_x:-1,pos_y:-1,selected:false,connections:[]};
+    }
+}
+
+
+export function updateNodeId(e:Event,selected_id:number){
+
+    let inputField = e.target as HTMLInputElement;
+    nodes.value.forEach((node)=>{
+        if(node.id == selected_id){
+            node.name = inputField.value;
+        }
+    });
+
+    // We change the reference so that the signal is updated
+    nodes.value = [...nodes.value];
 
 }

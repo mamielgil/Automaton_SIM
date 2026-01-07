@@ -5,8 +5,10 @@ export function NodeEditor(){
     // This component will appear in the program when a
     // single node is selected, allowing to modify its data
     let [isVisible,setVisibility] = useState(false);
+    let selected_node_data: Model.node_props = {id:-1,name: "-1",pos_x:-1,pos_y:-1,selected:false,connections:[]};
     function handle_editor_visibility(){
         if(Model.num_nodes_selected.value === 1 && Model.noOptionActive()){
+            selected_node_data = Model.find_selected_credentials();
             setVisibility(true);
         }else{
             setVisibility(false);
@@ -15,8 +17,10 @@ export function NodeEditor(){
     }
     handle_editor_visibility();
     return(
-         isVisible ? <div class = "flex box-border w-[200px] h-full bg-black pr[5px]">
-
+        isVisible ? <div class = "flex box-border w-[200px] bg-white pr-[5px] border min-h-0 p-[5px]">
+        <label class = "grow">Node name: </label>
+        <input class = "h-[20px] w-full" value = {selected_node_data.name} onInput = {(event)=>Model.updateNodeId(event as Event,selected_node_data.id)}></input>
+        
         </div> : null
 
 

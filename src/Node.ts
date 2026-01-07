@@ -2,16 +2,19 @@ import { type node_props, type connection_props} from "./model";
 import * as Model from "./model";
 export default class Node{
     my_id:number;
+    name:string;
     my_x:number;
     my_y:number;
     selected:boolean;
     myconnections:connection_props[];
-    constructor({id,pos_x,pos_y,selected,connections}:node_props){
+    constructor({id,name,pos_x,pos_y,selected,connections}:node_props){
         this.my_id = id;
+        this.name = name;
         this.my_x = pos_x;
         this.my_y = pos_y;
         this.selected = selected;
         this.myconnections = connections;
+
     }
 
     draw(gc:CanvasRenderingContext2D){
@@ -33,7 +36,7 @@ export default class Node{
         gc.lineWidth = 1;
         gc.stroke();
         gc.fillStyle = "black";
-        let myString = this.my_id.toString();
+        let myString = this.name;
         let myStringHeight = gc.measureText(myString).fontBoundingBoxAscent + gc.measureText(myString).fontBoundingBoxDescent;
         gc.fillText(myString,this.my_x - 0.5 * gc.measureText(myString).width,this.my_y + 0.4 * myStringHeight);
         gc.restore();
