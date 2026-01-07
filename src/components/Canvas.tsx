@@ -57,7 +57,8 @@ export function Canvas(){
     }
     return(
         <div ref = {containerRef} class =  "flex grow box-border pl-[5px] pr-[5px] pb-[5px] min-h-0">
-        <canvas class = "border bg-gray-400 w-full h-full grow" ref = {canvasRef} onClick = {Model.handleCanvasClick} > </canvas>
+        <canvas class = "border bg-gray-400 w-full h-full grow" ref = {canvasRef} onClick = {Model.handleCanvasClick}
+        onMouseDown={Model.handleCanvasDrag} onMouseUp={Model.handleCanvasDrag} onMouseMove={Model.handleCanvasDrag} > </canvas>
         </div>
 
     );

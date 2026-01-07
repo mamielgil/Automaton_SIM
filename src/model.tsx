@@ -1,4 +1,5 @@
 import {signal} from "@preact/signals"
+import { DragTranslator } from "./Drag_translator";
 
 export const NODE_RADIUS = 25;
 // This signal will store the current nodes of the automaton
@@ -37,7 +38,9 @@ export function changeAddMode(){
     
 
 }
-
+function noOptionActive(){
+    return !is_add_tool_active.value && !is_delete_tool_active.value && !is_connections_tool_active.value;
+}
 export function changeConnectionMode(){
 
     resetAllButtonSignals();
@@ -75,6 +78,30 @@ export function handleCanvasClick(e:Event){
     }else{
         handle_no_option(e as MouseEvent);
     }
+}
+
+let drag_translator = new DragTranslator();
+let to_drag_node = signal(-1);
+
+export function handleCanvasDrag(e:Event){
+
+    // We are only going to allow the nodes to be dragged if there is
+    // no current selected option
+    if(noOptionActive()){
+    let event:MouseEvent = e as MouseEvent;
+    if(event.type == "mousedown"){
+        // If a node is clicked it is possible that it will be dragged
+        to_drag_node.value = find_clicked_node(event.offsetX,event.offsetY);
+        if(to_drag_node.value != -1){
+            change_node_color(to_drag_node.value);
+        }
+    }
+    let translated_event = drag_translator.translate_event(event);
+    if(translated_event.type == "drag"){
+        change_node_pos(to_drag_node.value,translated_event.x,translated_event.y);
+    }
+    }
+
 }
 
 function handle_no_option(event:MouseEvent){
@@ -126,6 +153,7 @@ function handle_connection_option(event:MouseEvent){
     }
 }
 
+
 function change_node_pos(collided_id:number,transl_x:number,transl_y:number){
 
     // We go through all the nodes and change its coordinates to the one of the translated event
@@ -135,7 +163,7 @@ function change_node_pos(collided_id:number,transl_x:number,transl_y:number){
         if(node.id == collided_id){
             // If the id matches, we update the coordinates
             node.pos_x = transl_x;
-            node.pos_y = transl_y;
+            node.pos_y = transl_y - 2 * NODE_RADIUS;
         }
     });
 

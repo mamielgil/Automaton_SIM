@@ -37,7 +37,9 @@ export class DragTranslator{
                 break;
 
         }
-        return;
+        // If the event is not valid I return the blank event which is used as a 
+        // default event indicating that no drag was detected
+        return new MouseEvent("blank");
 
     }
 
