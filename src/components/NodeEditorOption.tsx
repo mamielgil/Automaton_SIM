@@ -1,5 +1,3 @@
-import * as Model from "../model"
-
 export type NodeEditorOptionProps = {
     my_label:string;
     my_value_input: string;

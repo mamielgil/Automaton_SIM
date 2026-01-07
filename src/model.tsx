@@ -346,9 +346,13 @@ export function updateNodeId(e:Event,selected_id:number){
 }
 
 export function updateConnection(event: Event, node_id: number, ending_node_id: number, associated_letter: string) {
+    
+    // We take the new value of the input tag and update the connection accordingly
     const inputField = event.target as HTMLInputElement;
     const new_letter = inputField.value;
 
+    // We only update the connection if the introduced letter is valid
+    if(verify_new_letter_connection(new_letter)){
     // We map through nodes to find the specific node, then map through its connections
     nodes.value = nodes.value.map((node) => {
         if (node.id === node_id) {
@@ -365,5 +369,15 @@ export function updateConnection(event: Event, node_id: number, ending_node_id: 
         }
         return node;
     });
+    }
+}
+
+function verify_new_letter_connection(letter:string){
+
+    if(letter.length > 1 || letter.length === 0){
+        return false;
+    }else{
+        return true;
+    }
 }
  
