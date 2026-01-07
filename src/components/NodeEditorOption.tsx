@@ -2,16 +2,17 @@ import * as Model from "../model"
 
 export type NodeEditorOptionProps = {
     my_label:string;
-    my_credentials: Model.node_props;
+    my_value_input: string;
+    onInputHandler:(event:Event)=>void;
 }
 
-export function NodeEditorOption({my_label,my_credentials}: NodeEditorOptionProps){
+export function NodeEditorOption({my_label,my_value_input,onInputHandler}: NodeEditorOptionProps){
 
-    let selected_node_data = my_credentials;
+   
     return(
     <div class = "flex box-border items-center">
          <label class = "w-[200px]">{my_label}</label>
-        <input class = "h-[20px] w-full" value = {selected_node_data.name} onInput = {(event)=>Model.updateNodeId(event as Event,selected_node_data.id)}></input>
+        <input class = "h-[20px] w-full" value = {my_value_input} onInput = {(event:Event)=>onInputHandler(event)}></input>
     </div>
 
 
