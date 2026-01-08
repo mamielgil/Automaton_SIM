@@ -1,6 +1,6 @@
 import * as Model from "../model"
 import { NodeEditorOption } from "./NodeEditorOption";
-import { NodeStateChange } from "./nodeStateChange";
+import { NodeStateChange } from "./NodeStateChange";
 
 
 export function NodeEditor(){
@@ -11,7 +11,7 @@ export function NodeEditor(){
     selected_node_data = Model.find_selected_credentials();
     return(
         Model.is_edit_tool_active.value ? <div class = "flex flex-col box-border w-[200px] bg-white pr-[5px] border min-h-0 p-[5px] gap-[10px]">
-        <NodeEditorOption my_label = {"Node name: "} my_value_input={selected_node_data.name} onInputHandler={(event)=>Model.updateNodeName(event as Event,selected_node_data.id)} ></NodeEditorOption>
+        <NodeEditorOption my_label = {"Node name:"} my_value_input={selected_node_data.name} onInputHandler={(event)=>Model.updateNodeName(event as Event,selected_node_data.id)} ></NodeEditorOption>
         <div class = "flex box-border flex-col gap-[10px]">
         <NodeStateChange my_class = "gap-[5px]" my_label = "Starting node" my_value_input={selected_node_data.starting_node} onInputHandler={(event)=>Model.change_starting_node_status(event,selected_node_data.id)}></NodeStateChange>
         <NodeStateChange my_class = "gap-[12px]" my_label = "Ending node" my_value_input = {selected_node_data.final_node} onInputHandler={(event)=>Model.change_final_node_status(event,selected_node_data.id)}></NodeStateChange>
@@ -19,8 +19,10 @@ export function NodeEditor(){
         <label>Connections: </label>
         {selected_node_data.connections.map((connection)=>{
             let my_string = selected_node_data.id.toString() + "-> " + connection.ending_name;
-            return(<NodeEditorOption my_label = {my_string} my_value_input = {connection.associated_letter} onInputHandler={(event)=> Model.updateConnection(event as Event,selected_node_data.id,connection.ending_node,connection.associated_letter)}></NodeEditorOption>);
+            return(<div class = "flex box-border gap-[5px]"><NodeEditorOption my_label = {my_string} my_value_input = {connection.associated_letter} onInputHandler={(event)=> Model.updateConnection(event as Event,selected_node_data.id,connection.ending_node,connection.associated_letter)}></NodeEditorOption>
+            <button class = "grow" onClick = {()=>Model.delete_connection(selected_node_data.id,connection)}>Delete</button></div>);
         })}
+        
         
         </div> : null
 

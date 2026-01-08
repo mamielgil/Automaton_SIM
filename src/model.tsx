@@ -454,3 +454,27 @@ export function change_final_node_status(event:Event,selected_id:number){
         }
     });
 }
+
+
+export function delete_connection(selected_id:number,to_delete_connection:connection_props){
+    nodes.value = nodes.value.map((node)=>{
+        if(node.id == selected_id){
+
+        let selected_connections = node.connections;
+            
+        selected_connections = selected_connections.filter((current_conn)=>{
+            if(current_conn.ending_node === to_delete_connection.ending_node &&
+                current_conn.associated_letter === to_delete_connection.associated_letter){
+                    return false;
+                }else{
+                    return true;
+                }
+        });
+        return {...node,connections:selected_connections};
+        }else{
+            return {...node};
+        }
+    });
+
+    nodes.value = [...nodes.value];
+}

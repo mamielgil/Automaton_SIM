@@ -15,5 +15,3 @@ Preact application that simulates Finite Automaton
     4. TO DO SOON -> PERFORM WORD ANALYSIS BY USING THE WORD ANALYSIS EDITOR
 
     5. When connections are drawn from A->B B->A, fix visual connection collision.
-
-    6. Add delete connection functionality
