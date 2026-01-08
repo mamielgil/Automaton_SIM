@@ -37,6 +37,13 @@ export const num_nodes_selected = computed(()=>{
 
 });
 
+export const current_selected_node = computed(()=>{
+    if(num_nodes_selected.value === 1){
+        // If there is only a single selected node we keep track of its id
+        return nodes.value.filter((node)=>node.selected === true)[0].id;
+    }
+})
+
 // This array will store the connection that needs to be created
 let connectionPair  = {starting_node : -1 , ending_node: -1, associated_letter: "-1" };
 
@@ -335,11 +342,18 @@ export function find_selected_credentials(){
 }
 
 
-export function updateNodeId(e:Event,selected_id:number){
+export function updateNodeName(e:Event,selected_id:number){
 
     let inputField = e.target as HTMLInputElement;
+    let temportal_canvas = document.createElement("canvas");
+
+    let gc = temportal_canvas.getContext("2d") as CanvasRenderingContext2D;
+
+    let new_text_width = gc.measureText(inputField.value).width;
+
     nodes.value.forEach((node)=>{
-        if(node.id == selected_id){
+        // We update the name to the associated node as long as it fits into the node
+        if(node.id == selected_id && new_text_width <= NODE_RADIUS * 1.75){
             node.name = inputField.value;
         }
     });
