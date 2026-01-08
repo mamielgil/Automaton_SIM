@@ -10,6 +10,8 @@ export type node_props = {
     pos_y:number;
     selected:boolean;
     connections: connection_props[];
+    starting_node:boolean;
+    final_node:boolean;
 }
 
 export type connection_props = {
@@ -20,11 +22,15 @@ export type connection_props = {
     associated_letter:string;
 
 }
+
+export type Automaton_type =  "DFA" | "NFA";
+
+export const automaton_type = signal<Automaton_type>("DFA");
+
 export let nodes = signal<node_props[]>([]);
 
 let node_id:number = 0;
 export const show_connection_popup = signal(false);
-
 export const is_add_tool_active = signal(false);
 export const is_delete_tool_active = signal(false);
 export const is_connections_tool_active = signal(false);
@@ -181,7 +187,7 @@ function handle_connection_option(event:MouseEvent){
 
 export function find_node_credentials(node_id:number){
 
-    let credentials:node_props = {id:-1,name:"-1",pos_x:-1,pos_y:-1,selected:false,connections:[]};
+    let credentials:node_props = {id:-1,name:"-1",pos_x:-1,pos_y:-1,selected:false,connections:[],starting_node:false,final_node:false};
     nodes.value.forEach((node)=>{
         if(node.id == node_id){
             credentials = node;
@@ -266,7 +272,7 @@ function handle_delete_option(event:MouseEvent){
     return collided_id;
     }
 export function create_node(x:number,y:number){
-    let new_node_info:node_props = {id:node_id,name: node_id.toString(), pos_x: x, pos_y: y, selected:false,connections:[]};
+    let new_node_info:node_props = {id:node_id,name: node_id.toString(), pos_x: x, pos_y: y, selected:false,connections:[],starting_node:false,final_node:false};
     // We increase the node id so that all nodes have a different id
     node_id++;
 
@@ -337,7 +343,7 @@ export function find_selected_credentials(){
         return nodes.value[index];
     }else{
         // We return a default "node" that allows us to know no node was detected
-        return {id:-1,name: "-1", pos_x:-1,pos_y:-1,selected:false,connections:[]};
+        return {id:-1,name: "-1", pos_x:-1,pos_y:-1,selected:false,connections:[],starting_node:false,final_node:false};
     }
 }
 
@@ -406,4 +412,45 @@ export function activateWordAnalysis(){
     resetAllButtonSignals();
     is_word_analysis_active.value = !previous_is_analysis;
 }
- 
+
+export function compute_word(event:Event){
+    //Depending on which automaton we are dealing with, the algorithm will be different
+
+    let myInput = event.target as HTMLInputElement;
+    let word_to_analyze = myInput.value;
+    if(automaton_type.value == "DFA"){
+        //Finite automaton computation
+
+    }
+}
+
+export function change_starting_node_status(event:Event,selected_id:number){
+    let myInput = event.target as HTMLInputElement;
+
+    let checked_status = myInput.checked;
+
+    // We go through all of the nodes until we find the selected node
+    // we then modify its credentials
+    nodes.value = nodes.value.map((node)=>{
+        if(node.id == selected_id){
+            return {...node,starting_node:checked_status};
+        }else{
+            return{...node};
+        }
+    });
+}
+
+export function change_final_node_status(event:Event,selected_id:number){
+    let myInput = event.target as HTMLInputElement;
+
+    let checked_status = myInput.checked;
+
+    // We find the corresponding node and change its checked status
+    nodes.value = nodes.value.map((node)=>{
+        if(node.id === selected_id){
+            return {...node,final_node:checked_status};
+        }else{
+            return {...node};
+        }
+    });
+}

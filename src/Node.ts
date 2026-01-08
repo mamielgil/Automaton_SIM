@@ -7,13 +7,17 @@ export default class Node{
     my_y:number;
     selected:boolean;
     myconnections:connection_props[];
-    constructor({id,name,pos_x,pos_y,selected,connections}:node_props){
+    starting_node:boolean;
+    final_node:boolean;
+    constructor({id,name,pos_x,pos_y,selected,connections,starting_node,final_node}:node_props){
         this.my_id = id;
         this.name = name;
         this.my_x = pos_x;
         this.my_y = pos_y;
         this.selected = selected;
         this.myconnections = connections;
+        this.starting_node = starting_node;
+        this.final_node = final_node;
 
     }
 
@@ -22,20 +26,33 @@ export default class Node{
         gc.save();
         
         // We now draw all the elements that form the node
-
-        gc.beginPath();
-        gc.arc(this.my_x,this.my_y,Model.NODE_RADIUS,0,2 * Math.PI);
-        gc.closePath();
         if(!this.selected){
         gc.fillStyle = "yellow";
         }else{
             gc.fillStyle = "orange";
         }
+        gc.beginPath();
+        gc.arc(this.my_x,this.my_y,Model.NODE_RADIUS,0,2 * Math.PI);
+        gc.closePath();
         gc.fill();
-
         gc.strokeStyle = "black";
         gc.lineWidth = 1;
         gc.stroke();
+
+        // We also draw an inner circle in the case that the node is final
+        if(this.final_node){
+
+            this.draw_final_state(gc);
+        }
+
+        // We also draw a special arrow in the case that it is a starting node
+
+        if(this.starting_node){
+            
+            this.draw_starting_arrow(gc,"hsl(99 100% 50.3%)");
+        }
+
+
         gc.fillStyle = "black";
         let myString = this.name;
         let myStringHeight = gc.measureText(myString).fontBoundingBoxAscent + gc.measureText(myString).fontBoundingBoxDescent;
@@ -65,14 +82,34 @@ export default class Node{
                 this.draw_cycle_connection(gc,connection);
             }
             
-           gc.restore();
+        gc.restore();
         })
 
     }
 
+    draw_starting_arrow(gc:CanvasRenderingContext2D,stroke_style:string){
+        gc.save();
+        gc.lineWidth = 2;
+        // The arrow will end at the left side of the node
+        let ending_x = this.my_x - Model.NODE_RADIUS - 1;
+
+        // The arrow will start 10 pixels to the left of the node
+        let starting_x = ending_x - 20;
+
+        gc.beginPath();
+        // We draw the corresponding line by moving to the starting point
+        gc.strokeStyle = stroke_style;
+        gc.moveTo(starting_x,this.my_y);
+        gc.lineTo(ending_x,this.my_y);
+        gc.closePath();
+        gc.stroke();
+        this.draw_arrow_head(gc,starting_x,this.my_y,ending_x,this.my_y,stroke_style);
+
+        gc.restore();
+    }
 
     draw_to_other_node_connection(gc:CanvasRenderingContext2D,connection:connection_props){
-         
+
             gc.save();
             // We now find the credentials of the ending node(we take the first element though there is always
             // going to be a single node that is returned in the filter function)
@@ -90,7 +127,7 @@ export default class Node{
             gc.strokeText(connection.associated_letter,middle_point_x - 5, middle_point_y - 5);
             gc.stroke();
             gc.closePath();
-            this.draw_arrow_head(gc, computed_values.initial_x, computed_values.initial_y, computed_values.final_x, computed_values.final_y);
+            this.draw_arrow_head(gc, computed_values.initial_x, computed_values.initial_y, computed_values.final_x, computed_values.final_y,"black");
             
             gc.restore();
     }
@@ -105,7 +142,7 @@ export default class Node{
         gc.closePath();
 
         // We draw the arrow heads to indicate the direction of the connection
-        this.draw_arrow_head(gc,this.my_x,this.my_y- 2 * Model.NODE_RADIUS,this.my_x + Model.NODE_RADIUS / 2 + 2,this.my_y - Model.NODE_RADIUS + 5);
+        this.draw_arrow_head(gc,this.my_x,this.my_y- 2 * Model.NODE_RADIUS,this.my_x + Model.NODE_RADIUS / 2 + 2,this.my_y - Model.NODE_RADIUS + 5,"black");
 
         // We draw the label that characterizes this particular connection
 
@@ -145,10 +182,10 @@ export default class Node{
 
     }
 
-    draw_arrow_head(gc: CanvasRenderingContext2D, start_x: number, start_y: number, end_x: number, end_y: number) {
+    draw_arrow_head(gc: CanvasRenderingContext2D, start_x: number, start_y: number, end_x: number, end_y: number,stroke_style:string) {
         
         gc.save();
-        gc.strokeStyle = "black";
+        gc.strokeStyle = stroke_style;
 
         // I establish a random length for the arrow head
         let head_length = 10;
@@ -173,6 +210,17 @@ export default class Node{
         gc.closePath();
         gc.restore();
     }
+
+    draw_final_state(gc:CanvasRenderingContext2D){
+        gc.save();
+        
+        gc.beginPath();
+        gc.arc(this.my_x,this.my_y,Model.NODE_RADIUS - 5,0,2 * Math.PI);
+        gc.closePath();
+        gc.stroke();
+
+        gc.restore();
+}
 
 
 

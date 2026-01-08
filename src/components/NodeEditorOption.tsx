@@ -11,7 +11,7 @@ export function NodeEditorOption({my_label,my_value_input,onInputHandler}: NodeE
     return(
     <div class = "flex box-border items-center">
         <label class = "w-[200px]">{my_label}</label>
-        <input class = "h-[20px] w-full" value = {my_value_input} onInput = {(event:Event)=>onInputHandler(event)}></input>
+        <input class = "h-[20px] w-full text-center" value = {my_value_input} onInput = {(event:Event)=>onInputHandler(event)}></input>
     </div>
 
 
