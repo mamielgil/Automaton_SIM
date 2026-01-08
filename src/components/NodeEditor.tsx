@@ -23,7 +23,6 @@ export function NodeEditor(){
             <button class = "grow" onClick = {()=>Model.delete_connection(selected_node_data.id,connection)}>Delete</button></div>);
         })}
         
-        
         </div> : null
 
 

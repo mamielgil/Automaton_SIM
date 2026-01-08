@@ -50,6 +50,11 @@ export const current_selected_node = computed(()=>{
     }
 })
 
+// Arrays that store starting and ending nodes
+// They are used to reduce the overhead due to the full node array scan
+let starting_nodes:number[] = [];
+let final_nodes:number[] = [];
+
 // This array will store the connection that needs to be created
 let connectionPair  = {starting_node : -1 , ending_node: -1, associated_letter: "-1" };
 
@@ -413,13 +418,27 @@ export function activateWordAnalysis(){
     is_word_analysis_active.value = !previous_is_analysis;
 }
 
-export function compute_word(event:Event){
+export function compute_word_directly(event:Event){
     //Depending on which automaton we are dealing with, the algorithm will be different
 
     let myInput = event.target as HTMLInputElement;
     let word_to_analyze = myInput.value;
     if(automaton_type.value == "DFA"){
-        //Finite automaton computation
+        //Deterministic automaton computation
+
+        // As it is a deterministic finite automaton, there can
+        // only be one initial state
+        let starting_node = starting_nodes[0];
+
+        // We get its credentials to go through the word
+        let starting_credentials = find_node_credentials(starting_node);
+        
+        // We take the first letter which is the one that the transition must have
+        let current_letter = word_to_analyze[0];
+        
+
+    }else{
+        //Non deterministic automaton computation
 
     }
 }
@@ -438,6 +457,16 @@ export function change_starting_node_status(event:Event,selected_id:number){
             return{...node};
         }
     });
+
+    if(checked_status){
+
+        // We add the node if it was set as a starting node
+        starting_nodes.push(selected_id);
+
+    }else{
+        // We remove the node from the array if its starting selection was removed
+        starting_nodes = starting_nodes.filter((node_id)=> node_id != selected_id);
+    }
 }
 
 export function change_final_node_status(event:Event,selected_id:number){
@@ -453,6 +482,14 @@ export function change_final_node_status(event:Event,selected_id:number){
             return {...node};
         }
     });
+
+    if(checked_status){
+        // We add the node to ending array if it was set
+        final_nodes.push(selected_id);
+    }else{
+        // We remove the node from the array if the final state was disabled
+        final_nodes = final_nodes.filter((node_id)=>node_id != selected_id);
+    }
 }
 
 
