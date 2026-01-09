@@ -423,24 +423,22 @@ export function compute_word_directly(event:Event){
 
     let myInput = event.target as HTMLInputElement;
     let word_to_analyze = myInput.value;
+    if(word_to_analyze.length === 0){
+        return false;
+    }
+    let result = false;
     if(automaton_type.value == "DFA"){
-        //Deterministic automaton computation
+        result = DFA_word_compute(word_to_analyze,starting_nodes[0]);
 
-        // As it is a deterministic finite automaton, there can
-        // only be one initial state
-        let starting_node = starting_nodes[0];
-
-        // We get its credentials to go through the word
-        let starting_credentials = find_node_credentials(starting_node);
-        
-        // We take the first letter which is the one that the transition must have
-        let current_letter = word_to_analyze[0];
+            
+            
         
 
     }else{
         //Non deterministic automaton computation
-
+        result = NDFA_word_compute(word_to_analyze,starting_nodes[0]);
     }
+    return result;
 }
 
 export function change_starting_node_status(event:Event,selected_id:number){
@@ -514,4 +512,39 @@ export function delete_connection(selected_id:number,to_delete_connection:connec
     });
 
     nodes.value = [...nodes.value];
+}
+
+function DFA_word_compute(word:string,starting_node:number){
+    
+    let current_node_id = starting_node;
+
+    for(let letter of word){
+        let current_node = find_node_credentials(current_node_id);
+
+        // In case there is a wrong node that was passed
+        if(current_node.id === -1){return false;}
+
+        // We look for the first connection that is valid
+        let valid_transition = current_node.connections.find((connection)=>{
+            connection.associated_letter === letter;
+        });
+
+        if(valid_transition){
+            current_node_id = valid_transition.ending_node;
+        }else{
+            // This means that no valid transition was found
+            return false;
+        }
+        
+
+    }
+    // Once we have gone through all of the letters, if we exit the loop
+    // then the word will be valid if the end node is final
+    return find_node_credentials(current_node_id).final_node;
+    
+}
+
+
+function NDFA_word_compute(word:string,starting_node:number){
+    return false;
 }
