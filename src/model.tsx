@@ -50,6 +50,9 @@ export const current_selected_node = computed(()=>{
     }
 })
 
+export const word_to_analyze = signal("");
+export const word_resolution = signal("");
+
 // Arrays that store starting and ending nodes
 // They are used to reduce the overhead due to the full node array scan
 let starting_nodes:number[] = [];
@@ -308,6 +311,7 @@ function resetAllButtonSignals(){
     is_connections_tool_active.value = false;
     is_edit_tool_active.value = false;
     is_word_analysis_active.value = false;
+    word_resolution.value = "";
 }
 
 function create_connection(starting_node:number,end_node:number,end_name:string,my_letter:string){
@@ -418,27 +422,27 @@ export function activateWordAnalysis(){
     is_word_analysis_active.value = !previous_is_analysis;
 }
 
-export function compute_word_directly(event:Event){
+export function compute_word_directly(){
     //Depending on which automaton we are dealing with, the algorithm will be different
-
-    let myInput = event.target as HTMLInputElement;
-    let word_to_analyze = myInput.value;
-    if(word_to_analyze.length === 0){
+    let result = false;
+    let word = word_to_analyze.value;
+    if(word.length === 0){
         return false;
     }
-    let result = false;
     if(automaton_type.value == "DFA"){
-        result = DFA_word_compute(word_to_analyze,starting_nodes[0]);
-
+        result = DFA_word_compute(word,starting_nodes[0]);
+        
             
             
         
 
     }else{
         //Non deterministic automaton computation
-        result = NDFA_word_compute(word_to_analyze,starting_nodes[0]);
+        result = NDFA_word_compute(word,starting_nodes[0]);
     }
-    return result;
+    
+    word_resolution.value = result? "WORD IS VALID" :"WORD IS INVALID";
+    
 }
 
 export function change_starting_node_status(event:Event,selected_id:number){
@@ -492,14 +496,21 @@ export function change_final_node_status(event:Event,selected_id:number){
 
 
 export function delete_connection(selected_id:number,to_delete_connection:connection_props){
+    
+    // Flag to control if a connection has already been deleted or not
+    // This is used to avoid deleting all the connections that are identical.
+    // We just delete the first occurance
+    let has_been_deleted = false;
+    
     nodes.value = nodes.value.map((node)=>{
         if(node.id == selected_id){
 
         let selected_connections = node.connections;
             
         selected_connections = selected_connections.filter((current_conn)=>{
-            if(current_conn.ending_node === to_delete_connection.ending_node &&
+            if( !has_been_deleted && current_conn.ending_node === to_delete_connection.ending_node &&
                 current_conn.associated_letter === to_delete_connection.associated_letter){
+                    has_been_deleted = true;
                     return false;
                 }else{
                     return true;
@@ -515,7 +526,9 @@ export function delete_connection(selected_id:number,to_delete_connection:connec
 }
 
 function DFA_word_compute(word:string,starting_node:number){
-    
+    // In this case the algorithm is used considering that in
+    // each node, there can only be a single connection with each 
+    // letter.
     let current_node_id = starting_node;
 
     for(let letter of word){
@@ -526,7 +539,7 @@ function DFA_word_compute(word:string,starting_node:number){
 
         // We look for the first connection that is valid
         let valid_transition = current_node.connections.find((connection)=>{
-            connection.associated_letter === letter;
+            return connection.associated_letter === letter;
         });
 
         if(valid_transition){
@@ -541,10 +554,48 @@ function DFA_word_compute(word:string,starting_node:number){
     // Once we have gone through all of the letters, if we exit the loop
     // then the word will be valid if the end node is final
     return find_node_credentials(current_node_id).final_node;
-    
 }
 
 
 function NDFA_word_compute(word:string,starting_node:number){
+    // In this case, my approach is to perform a BFS so that we stop as the 
+    // lowest valid connection
+    let current_node_id = starting_node;
+
+    //BFS IMPLEMENTATION
+    
     return false;
+}
+
+
+export function update_word_to_analyze(event:Event){
+    let myInput = event.target as HTMLInputElement;
+
+    // We take the value from the input field and update 
+    // the signal that stores the word
+    word_to_analyze.value = myInput.value;
+
+
+}
+
+export function compute_step_by_step(){
+
+    let result = false;
+    let word = word_to_analyze.value;
+    if(word.length === 0){
+        return false;
+    }
+    if(automaton_type.value == "DFA"){
+        
+        // SKELETON LEFT FOR FUTURE DEVELOPMENT
+        
+            
+            
+        
+
+    }else{
+    }
+    
+    word_resolution.value = result? "WORD IS VALID" :"WORD IS INVALID";
+    
 }

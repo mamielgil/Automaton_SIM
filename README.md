@@ -10,8 +10,6 @@ Preact application that simulates Finite Automaton
     2. Force properties from DFA or NFA depending on what
     automaton type was selected
 
-    3.Develop automatic and step by step word analysis
+    3. Figure out NDFA direct computation and step by step computation for both types.
 
-    4. TO DO SOON -> PERFORM WORD ANALYSIS BY USING THE WORD ANALYSIS EDITOR
-
-    5. When connections are drawn from A->B B->A, fix visual connection collision.
+    4. When connections are drawn from A->B B->A, fix visual connection collision.
