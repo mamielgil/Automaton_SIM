@@ -51,7 +51,11 @@ export const current_selected_node = computed(()=>{
 })
 
 export const word_to_analyze = signal("");
-export const word_resolution = signal("");
+export const auto_word_resolution = signal("");
+export const step_by_step_word_resolution = signal("");
+// Signal that is used to notify the program that the first step of the 
+// step by step analysis was performed
+export const first_step_performed = signal(false);
 
 // Arrays that store starting and ending nodes
 // They are used to reduce the overhead due to the full node array scan
@@ -185,7 +189,6 @@ function handle_connection_option(event:MouseEvent){
 
                     // We set the clicked node to a different color so that the user knows that it was selected
                     change_node_color(collided_id);
- 
                 }
             
             
@@ -311,7 +314,7 @@ function resetAllButtonSignals(){
     is_connections_tool_active.value = false;
     is_edit_tool_active.value = false;
     is_word_analysis_active.value = false;
-    word_resolution.value = "";
+    auto_word_resolution.value = "";
 }
 
 function create_connection(starting_node:number,end_node:number,end_name:string,my_letter:string){
@@ -441,7 +444,7 @@ export function compute_word_directly(){
         result = NDFA_word_compute(word,starting_nodes[0]);
     }
     
-    word_resolution.value = result? "WORD IS VALID" :"WORD IS INVALID";
+    auto_word_resolution.value = result? "WORD IS VALID" :"WORD IS INVALID";
     
 }
 
@@ -578,24 +581,106 @@ export function update_word_to_analyze(event:Event){
 
 }
 
+let to_visit_node:number = -1;
+
+
+export function first_step(){
+    // The first step is finding the starting node so that the algorithm can start
+    reset_node_selection();
+    first_step_performed.value = true;
+    to_visit_node = -1;
+    
+    if(starting_nodes.length > 0){
+        to_visit_node = starting_nodes[0];
+        let node_name = "";
+        nodes.value = nodes.value.map((node)=>{
+        if(node.id === to_visit_node){
+            node_name = node.name;
+            return {...node, selected:true};
+        }else{
+            return {...node, selected:false};
+        }
+        });
+
+        step_by_step_word_resolution.value = "START: CURRENT NODE " + node_name;
+        return true;
+}   else{
+    // This means that there is no starting node assigned
+    step_by_step_word_resolution.value = "NO STARTING NODE FOUND";
+    return false;
+    }
+}
+
 export function compute_step_by_step(){
 
-    let result = false;
-    let word = word_to_analyze.value;
-    if(word.length === 0){
-        return false;
+    //First as we are going to go node through node, selecting them to indicate 
+    // where we are, we need to deselect all of the nodes
+    reset_node_selection();
+    
+    if(word_to_analyze.value.length === 0){
+        if(find_node_credentials(to_visit_node).final_node){
+        step_by_step_word_resolution.value = "FINISHED: WORD WAS VALID";
+        }else{
+        step_by_step_word_resolution.value = "FINISHED: WORD WAS NOT VALID";
+        }
+        // We force the message to dissapear after some time
+        setTimeout(()=>{first_step_performed.value = false;},5000);
+        return;
     }
+    // In this case, we are going to advance letter by letter
+    let letter = word_to_analyze.value[0];
+    let valid_transition: connection_props;
+    let result:boolean = false;
+    let previous_node = find_node_credentials(to_visit_node).name;
     if(automaton_type.value == "DFA"){
-        
-        // SKELETON LEFT FOR FUTURE DEVELOPMENT
-        
-            
-            
-        
+        valid_transition = DFA_one_step_compute(letter);
 
+        if(valid_transition.ending_node != -1){
+            // This means that a transition was found
+            result = true;
+            select_node(to_visit_node);
+            
+        }else{result = false;}
+        
     }else{
+        // FOR LATER NDA implementation
     }
     
-    word_resolution.value = result? "WORD IS VALID" :"WORD IS INVALID";
+    step_by_step_word_resolution.value = result? "FOUND TRANSITION " + previous_node.toString() + "->" + find_node_credentials(to_visit_node).name :"INVALID WORD";
     
 }
+
+function DFA_one_step_compute(letter:string){
+
+    
+    // Now we check if there is a valid transition
+    let current_credentials = find_node_credentials(to_visit_node);
+
+    let valid_transition = current_credentials.connections.find((connection)=>{
+        return connection.associated_letter === letter;
+    });
+    
+    if(valid_transition){
+        // This means that a valid transition was found
+        to_visit_node = valid_transition.ending_node;
+        // We reduce one letter of the word
+        word_to_analyze.value = word_to_analyze.value.slice(1,word_to_analyze.value.length);
+        
+        
+        return valid_transition;
+    }
+    // This matches the cases in which no valid transition was found
+        return {ending_node:-1,associated_letter:"-1",ending_name:"-1"}; 
+}
+
+function select_node(node_id:number){
+    nodes.value = nodes.value.map((node)=>{
+        if(node.id == node_id){
+            return{...node,selected:true};
+            
+        }else{
+            return {...node};
+        }
+    })
+}
+
