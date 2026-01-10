@@ -582,13 +582,17 @@ export function update_word_to_analyze(event:Event){
 }
 
 let to_visit_node:number = -1;
-
+let step_by_step_timeout: ReturnType<typeof setTimeout>|null = null;
 
 export function first_step(){
     // The first step is finding the starting node so that the algorithm can start
     reset_node_selection();
     first_step_performed.value = true;
     to_visit_node = -1;
+
+    if(step_by_step_timeout){
+        clearTimeout(step_by_step_timeout);
+    }
     
     if(starting_nodes.length > 0){
         to_visit_node = starting_nodes[0];
@@ -607,6 +611,8 @@ export function first_step(){
 }   else{
     // This means that there is no starting node assigned
     step_by_step_word_resolution.value = "NO STARTING NODE FOUND";
+    step_by_step_timeout = setTimeout(()=>{first_step_performed.value = false;},2000);
+
     return false;
     }
 }
@@ -621,16 +627,19 @@ export function compute_step_by_step(){
         if(find_node_credentials(to_visit_node).final_node){
         step_by_step_word_resolution.value = "FINISHED: WORD WAS VALID";
         }else{
-        step_by_step_word_resolution.value = "FINISHED: WORD WAS NOT VALID";
+        step_by_step_word_resolution.value = "FINISHED: WORD WAS INVALID";
         }
-        // We force the message to dissapear after some time
-        setTimeout(()=>{first_step_performed.value = false;},5000);
+        // We force the step by step view to dissapear after 5 seconds
+        step_by_step_timeout = setTimeout(()=>{first_step_performed.value = false;},3000);
         return;
     }
     // In this case, we are going to advance letter by letter
     let letter = word_to_analyze.value[0];
     let valid_transition: connection_props;
     let result:boolean = false;
+
+    // This variable is used to know the previous node name so that
+    // we can identify the transition if it is found
     let previous_node = find_node_credentials(to_visit_node).name;
     if(automaton_type.value == "DFA"){
         valid_transition = DFA_one_step_compute(letter);
@@ -640,13 +649,16 @@ export function compute_step_by_step(){
             result = true;
             select_node(to_visit_node);
             
-        }else{result = false;}
+        }else{
+            result = false;
+            word_to_analyze.value = "";
+        }
         
     }else{
         // FOR LATER NDA implementation
     }
     
-    step_by_step_word_resolution.value = result? "FOUND TRANSITION " + previous_node.toString() + "->" + find_node_credentials(to_visit_node).name :"INVALID WORD";
+    step_by_step_word_resolution.value = result? "FOUND TRANSITION " + previous_node.toString() + "->" + find_node_credentials(to_visit_node).name :"NO TRANSITION WAS FOUND";
     
 }
 
