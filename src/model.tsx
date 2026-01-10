@@ -751,5 +751,4 @@ export function change_automaton_mode(event:Event){
     let chosenOption = mySelector.value as Automaton_type;
 
     automaton_type.value = chosenOption;
-    console.log("Current mode is : ", automaton_type.value);
 }
