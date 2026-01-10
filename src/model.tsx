@@ -650,8 +650,8 @@ export function first_step(){
         }else{
             word = word_to_analyze.value;
         }
-        step_by_step_word_resolution.value = "THE WORD: " + word + " IS BEING ANALYZED "
-        step_by_step_word_resolution.value += "START: CURRENT NODE " + node_name;
+        step_by_step_word_resolution.value = "WORD: " + word;
+        step_by_step_word_resolution.value += "\nSTART: CURRENT NODE " + node_name;
         return true;
 }   else{
     // This means that there is no starting node assigned

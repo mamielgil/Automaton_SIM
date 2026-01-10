@@ -15,7 +15,7 @@ export function WordAnalysisEditor(){
         <label class = "pl-[40px]">{Model.auto_word_resolution.value}</label>
         <button onClick = {()=>Model.compute_word_directly()}> Auto computation</button>
         <button onClick = {()=>first_step()}> Step by step computation</button>
-        {Model.first_step_performed.value ? <div class = "flex box-border flex-col"><label>{Model.step_by_step_word_resolution.value}</label>{ valid_first_step ? <button onClick = {Model.compute_step_by_step}>Next Step</button> : null} </div> : null}
+        {Model.first_step_performed.value ? <div class = "flex box-border flex-col"><label class = "block whitespace-pre-line">{Model.step_by_step_word_resolution.value}</label>{ valid_first_step ? <button onClick = {Model.compute_step_by_step}>Next Step</button> : null} </div> : null}
         </div>
         </div> : null
 
