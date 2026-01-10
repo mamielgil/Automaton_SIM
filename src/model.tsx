@@ -445,7 +445,8 @@ export function compute_word_directly(){
     }
     
     auto_word_resolution.value = result? "WORD IS VALID" :"WORD IS INVALID";
-    
+    // Once the word has been analyzed we reset the value of this signal
+    word_to_analyze.value = "";
 }
 
 export function change_starting_node_status(event:Event,selected_id:number){
@@ -605,8 +606,14 @@ export function first_step(){
             return {...node, selected:false};
         }
         });
-
-        step_by_step_word_resolution.value = "START: CURRENT NODE " + node_name;
+        let word:string = "-1";
+        if(word_to_analyze.value === ""){
+            word = "EMPTY STRING";
+        }else{
+            word = word_to_analyze.value;
+        }
+        step_by_step_word_resolution.value = "THE WORD: " + word + " IS BEING ANALYZED "
+        step_by_step_word_resolution.value += "START: CURRENT NODE " + node_name;
         return true;
 }   else{
     // This means that there is no starting node assigned
@@ -625,9 +632,9 @@ export function compute_step_by_step(){
     
     if(word_to_analyze.value.length === 0){
         if(find_node_credentials(to_visit_node).final_node){
-        step_by_step_word_resolution.value = "FINISHED: WORD WAS VALID";
+        step_by_step_word_resolution.value = "FINISHED: VALID WORD";
         }else{
-        step_by_step_word_resolution.value = "FINISHED: WORD WAS INVALID";
+        step_by_step_word_resolution.value = "FINISHED: INVALID WORD";
         }
         // We force the step by step view to dissapear after 5 seconds
         step_by_step_timeout = setTimeout(()=>{first_step_performed.value = false;},3000);
@@ -657,8 +664,8 @@ export function compute_step_by_step(){
     }else{
         // FOR LATER NDA implementation
     }
-    
-    step_by_step_word_resolution.value = result? "FOUND TRANSITION " + previous_node.toString() + "->" + find_node_credentials(to_visit_node).name :"NO TRANSITION WAS FOUND";
+    step_by_step_word_resolution.value = "CURRENT NODE " + previous_node.toString();
+    step_by_step_word_resolution.value += result? " FOUND TRANSITION " + previous_node.toString() + "->" + find_node_credentials(to_visit_node).name :" NO TRANSITION WAS FOUND";
     if(!result){
         to_visit_node = -1;
     }
