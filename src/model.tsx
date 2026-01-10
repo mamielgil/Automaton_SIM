@@ -57,10 +57,15 @@ export const step_by_step_word_resolution = signal("");
 // step by step analysis was performed
 export const first_step_performed = signal(false);
 
-// Arrays that store starting and ending nodes
-// They are used to reduce the overhead due to the full node array scan
-let starting_nodes:number[] = [];
-let final_nodes:number[] = [];
+// Signals that store all of the starting and ending nodes
+// We filter the nodes to find the starting or the final ones
+// Then we extract their ids
+let starting_nodes = computed(()=>{
+    return nodes.value.filter((node)=>node.starting_node).map(node=>node.id);
+})
+let final_nodes = computed(()=>{
+    return nodes.value.filter((node)=>node.final_node).map((node)=>node.id);
+})
 
 // This array will store the connection that needs to be created
 let connectionPair  = {starting_node : -1 , ending_node: -1, associated_letter: "-1" };
@@ -433,7 +438,7 @@ export function compute_word_directly(){
         return false;
     }
     if(automaton_type.value == "DFA"){
-        result = DFA_word_compute(word,starting_nodes[0]);
+        result = DFA_word_compute(word,starting_nodes.value[0]);
         
             
             
@@ -441,7 +446,7 @@ export function compute_word_directly(){
 
     }else{
         //Non deterministic automaton computation
-        result = NDFA_word_compute(word,starting_nodes[0]);
+        result = NFA_word_compute(word,starting_nodes.value[0]);
     }
     
     auto_word_resolution.value = result? "WORD IS VALID" :"WORD IS INVALID";
@@ -456,49 +461,80 @@ export function change_starting_node_status(event:Event,selected_id:number){
 
     // We go through all of the nodes until we find the selected node
     // we then modify its credentials
-    nodes.value = nodes.value.map((node)=>{
-        if(node.id == selected_id){
-            return {...node,starting_node:checked_status};
-        }else{
-            return{...node};
-        }
-    });
-
-    if(checked_status){
-
-        // We add the node if it was set as a starting node
-        starting_nodes.push(selected_id);
-
+    if(automaton_type.value === "DFA"){
+        handle_starting_status_DFA(checked_status,selected_id);
     }else{
-        // We remove the node from the array if its starting selection was removed
-        starting_nodes = starting_nodes.filter((node_id)=> node_id != selected_id);
+        //NFA automaton logic
     }
 }
 
-export function change_final_node_status(event:Event,selected_id:number){
-    let myInput = event.target as HTMLInputElement;
+export function handle_starting_status_DFA(checked_status:boolean,selected_id:number){
 
-    let checked_status = myInput.checked;
+    // In a DFA there can only be a single starting node
 
-    // We find the corresponding node and change its checked status
+    if(checked_status){
     nodes.value = nodes.value.map((node)=>{
         if(node.id === selected_id){
-            return {...node,final_node:checked_status};
+            return {...node,starting_node:true};
         }else{
+            // We force all the nodes to be unchecked
+            return {...node,starting_node:false};
+        }
+    });
+    }else{
+        nodes.value = nodes.value.map((node)=>{
+        if(node.id === selected_id){
+            return {...node,starting_node:false};
+        }else{
+            // We force all the nodes to be unchecked
             return {...node};
         }
     });
 
-    if(checked_status){
-        // We add the node to ending array if it was set
-        final_nodes.push(selected_id);
-    }else{
-        // We remove the node from the array if the final state was disabled
-        final_nodes = final_nodes.filter((node_id)=>node_id != selected_id);
     }
+
+}
+
+export function change_final_node_status(event:Event,selected_id:number){
+     let myInput = event.target as HTMLInputElement;
+
+    let checked_status = myInput.checked;
+
+    // We go through all of the nodes until we find the selected node
+    // we then modify its credentials
+    if(automaton_type.value === "DFA"){
+        handle_final_status_DFA(checked_status,selected_id);
+    }else{
+        //NFA automaton logic
+    }
+
 }
 
 
+function handle_final_status_DFA(checked_status:boolean,selected_id:number){
+     // In a DFA there can only be a single final node
+
+    if(checked_status){
+    nodes.value = nodes.value.map((node)=>{
+        if(node.id === selected_id){
+            return {...node,final_node:true};
+        }else{
+            // We force all the nodes to be unchecked
+            return {...node,final_node:false};
+        }
+    });
+    }else{
+        nodes.value = nodes.value.map((node)=>{
+        if(node.id === selected_id){
+            return {...node,final_node:false};
+        }else{
+            // We force all the nodes to be unchecked
+            return {...node};
+        }
+    });
+
+    }
+}
 export function delete_connection(selected_id:number,to_delete_connection:connection_props){
     
     // Flag to control if a connection has already been deleted or not
@@ -561,7 +597,7 @@ function DFA_word_compute(word:string,starting_node:number){
 }
 
 
-function NDFA_word_compute(word:string,starting_node:number){
+function NFA_word_compute(word:string,starting_node:number){
     // In this case, my approach is to perform a BFS so that we stop as the 
     // lowest valid connection
     let current_node_id = starting_node;
@@ -595,8 +631,8 @@ export function first_step(){
         clearTimeout(step_by_step_timeout);
     }
     
-    if(starting_nodes.length > 0){
-        to_visit_node = starting_nodes[0];
+    if(starting_nodes.value.length > 0){
+        to_visit_node = starting_nodes.value[0];
         let node_name = "";
         nodes.value = nodes.value.map((node)=>{
         if(node.id === to_visit_node){
