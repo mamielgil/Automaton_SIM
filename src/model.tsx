@@ -631,6 +631,7 @@ export function compute_step_by_step(){
     reset_node_selection();
     
     if(word_to_analyze.value.length === 0){
+        select_node(to_visit_node);
         if(find_node_credentials(to_visit_node).final_node){
         step_by_step_word_resolution.value = "FINISHED: VALID WORD";
         }else{
@@ -647,14 +648,14 @@ export function compute_step_by_step(){
 
     // This variable is used to know the previous node name so that
     // we can identify the transition if it is found
-    let previous_node = find_node_credentials(to_visit_node).name;
+    let previous_node = find_node_credentials(to_visit_node);
     if(automaton_type.value == "DFA"){
         valid_transition = DFA_one_step_compute(letter);
 
         if(valid_transition.ending_node != -1){
             // This means that a transition was found
             result = true;
-            select_node(to_visit_node);
+            select_node(previous_node.id);
             
         }else{
             result = false;
@@ -664,8 +665,8 @@ export function compute_step_by_step(){
     }else{
         // FOR LATER NDA implementation
     }
-    step_by_step_word_resolution.value = "CURRENT NODE " + previous_node.toString();
-    step_by_step_word_resolution.value += result? " FOUND TRANSITION " + previous_node.toString() + "->" + find_node_credentials(to_visit_node).name :" NO TRANSITION WAS FOUND";
+    step_by_step_word_resolution.value = "CURRENT NODE " + previous_node.name.toString();
+    step_by_step_word_resolution.value += result? " TRANSITION " + previous_node.name.toString() + "->" + find_node_credentials(to_visit_node).name + " (" + letter + ")" :" NO TRANSITION WAS FOUND";
     if(!result){
         to_visit_node = -1;
     }
@@ -705,3 +706,12 @@ function select_node(node_id:number){
     })
 }
 
+export function change_automaton_mode(event:Event){
+
+    let mySelector = event.target as HTMLSelectElement;
+    
+    let chosenOption = mySelector.value as Automaton_type;
+
+    automaton_type.value = chosenOption;
+    console.log("Current mode is : ", automaton_type.value);
+}
