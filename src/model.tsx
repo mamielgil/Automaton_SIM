@@ -515,6 +515,8 @@ function handle_final_status_DFA(checked_status:boolean,selected_id:number){
      // In a DFA there can only be a single final node
 
     if(checked_status){
+        // If a new node was selected as final, we need deselect all of them
+        // and only select the current selected node
     nodes.value = nodes.value.map((node)=>{
         if(node.id === selected_id){
             return {...node,final_node:true};

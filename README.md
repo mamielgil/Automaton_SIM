@@ -8,7 +8,7 @@ Preact application that simulates Finite Automaton
         - None selected -> default cursor
     
     2. Force properties from DFA or NFA depending on what
-    automaton type was selected
+    automaton type was selected. Specifically develop a single connection of each letter for a given node. Moreover, we need to develop NFA conditions.
 
     3. Figure direct and step by step for NFA
 
