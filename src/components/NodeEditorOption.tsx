@@ -10,8 +10,7 @@ export function NodeEditorOption({my_label,my_value_input,onInputHandler, disabl
     let my_input_class = "h-[20px] w-[80px] text-center";
     
     if(disabled){
-        // We establish the important! to override the global main.css file
-        my_input_class += " !border-red-500";
+        my_input_class += " border-red-500";
     }
     return(
     <div class = "flex box-border items-center gap-[5px]">

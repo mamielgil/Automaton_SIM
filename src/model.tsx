@@ -659,7 +659,9 @@ export function compute_step_by_step(){
     }
     
     step_by_step_word_resolution.value = result? "FOUND TRANSITION " + previous_node.toString() + "->" + find_node_credentials(to_visit_node).name :"NO TRANSITION WAS FOUND";
-    
+    if(!result){
+        to_visit_node = -1;
+    }
 }
 
 function DFA_one_step_compute(letter:string){

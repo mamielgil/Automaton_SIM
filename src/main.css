@@ -6,6 +6,6 @@ button{
 }
 
 input {
-   @apply border border-black font-serif;
+   @apply border font-serif;
 
 }
