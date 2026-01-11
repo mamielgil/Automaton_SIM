@@ -514,28 +514,15 @@ export function change_final_node_status(event:Event,selected_id:number){
 function handle_final_status_DFA(checked_status:boolean,selected_id:number){
      // In a DFA there can only be a single final node
 
-    if(checked_status){
-        // If a new node was selected as final, we need deselect all of them
-        // and only select the current selected node
     nodes.value = nodes.value.map((node)=>{
         if(node.id === selected_id){
-            return {...node,final_node:true};
+            // We update the checked status for the node that was clicked
+            return {...node,final_node:checked_status};
+
         }else{
-            // We force all the nodes to be unchecked
-            return {...node,final_node:false};
-        }
-    });
-    }else{
-        nodes.value = nodes.value.map((node)=>{
-        if(node.id === selected_id){
-            return {...node,final_node:false};
-        }else{
-            // We force all the nodes to be unchecked
             return {...node};
         }
     });
-
-    }
 }
 export function delete_connection(selected_id:number,to_delete_connection:connection_props){
     
