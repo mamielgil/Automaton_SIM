@@ -435,20 +435,21 @@ export function compute_word_directly(){
     let result = false;
     let word = word_to_analyze.value;
     if(word.length === 0){
-        return false;
-    }
-    if(automaton_type.value == "DFA"){
-        result = DFA_word_compute(word,starting_nodes.value[0]);
-        
-            
-            
-        
-
+        result = find_node_credentials(starting_nodes.value[0]).final_node; 
     }else{
-        //Non deterministic automaton computation
-        result = NFA_word_compute(word,starting_nodes.value[0]);
-    }
-    
+        if(automaton_type.value == "DFA"){
+            result = DFA_word_compute(word,starting_nodes.value[0]);
+            
+                
+                
+            
+
+        }else{
+            //Non deterministic automaton computation
+            result = NFA_word_compute(word,starting_nodes.value[0]);
+        }
+        }
+        
     auto_word_resolution.value = result? "WORD IS VALID" :"WORD IS INVALID";
     // Once the word has been analyzed we reset the value of this signal
     word_to_analyze.value = "";
@@ -496,7 +497,7 @@ export function handle_starting_status_DFA(checked_status:boolean,selected_id:nu
 }
 
 export function change_final_node_status(event:Event,selected_id:number){
-     let myInput = event.target as HTMLInputElement;
+    let myInput = event.target as HTMLInputElement;
 
     let checked_status = myInput.checked;
 
