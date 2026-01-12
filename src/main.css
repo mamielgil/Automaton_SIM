@@ -6,12 +6,16 @@ button{
 }
 
 button:disabled{
-   @apply text-red-600  border-red-600
+   @apply text-red-600  border-red-600;
 }
 
 input {
    @apply border font-serif;
 
+}
+
+input:disabled{
+   @apply border-red-600;
 }
 
 select{
