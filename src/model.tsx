@@ -48,7 +48,7 @@ export const current_selected_node = computed(()=>{
         // If there is only a single selected node we keep track of its id
         return nodes.value.filter((node)=>node.selected === true)[0].id;
     }
-})
+});
 
 export const word_to_analyze = signal("");
 export const auto_word_resolution = signal("");
@@ -57,15 +57,16 @@ export const step_by_step_word_resolution = signal("");
 // step by step analysis was performed
 export const first_step_performed = signal(false);
 
-// Signals that store all of the starting and ending nodes
-// We filter the nodes to find the starting or the final ones
+// This signal is used to keep track of the presence of repeated transitions in a NFA
+// so that when we switch back to DFA the transitions can be reestablished
+export const repeated_letter_in_a_node = signal(false);
+
+// Signals that store all of the starting
+// We filter the nodes to find the starting
 // Then we extract their ids
 let starting_nodes = computed(()=>{
     return nodes.value.filter((node)=>node.starting_node).map(node=>node.id);
-})
-let final_nodes = computed(()=>{
-    return nodes.value.filter((node)=>node.final_node).map((node)=>node.id);
-})
+});
 
 // This array will store the connection that needs to be created
 let connectionPair  = {starting_node : -1 , ending_node: -1, associated_letter: "-1" };
@@ -332,12 +333,7 @@ function create_connection(starting_node:number,end_node:number,end_name:string,
             // We update the reference so that the update is noticed by the engine
             nodes.value = [...nodes.value];
         }
-    })
-
-    nodes.value.forEach((node)=>{
-        console.log(node);
-    })
-
+    });
 }
 
 export function find_selected_credentials(){
@@ -390,23 +386,47 @@ export function updateConnection(event: Event, node_id: number, ending_node_id: 
     
     // We take the new value of the input tag and update the connection accordingly
     const inputField = event.target as HTMLInputElement;
-    const new_letter = inputField.value;
+    let new_letter = inputField.value;
 
+    if(new_letter.length > 1 && new_letter.includes("λ")){
+        // If it includes lambda we remove them so that the new input 
+        // can be read correctly
+        new_letter = new_letter.replace("λ","");
+    }
     // We only update the connection if the introduced letter is valid
     if(verify_new_letter_connection(new_letter)){
     // We map through nodes to find the specific node, then map through its connections
     nodes.value = nodes.value.map((node) => {
         if (node.id === node_id) {
+            
+            // For a DFA we can only have a single connection for a given letter
+            let can_update = true;
+            if(automaton_type.value === "DFA"){
+                 can_update = check_if_not_repeated(node,new_letter);
+            }else{
+                // In a NFA we can allow as many repeated connections as we wish
+                can_update = true;
+                // We run the check if not repeated just to update the signal that stores if repeated connections exist
+                if(!repeated_letter_in_a_node.value){
+                    // We just update it if it is not already true
+                repeated_letter_in_a_node.value = !check_if_not_repeated(node,new_letter);
+                }
+            }
+            if(can_update){
             // Found the node, now update its connections
             const updatedConnections = node.connections.map((conn) => {
                 // We identify the specific connection to update
                 // Note: Checking old_letter ensures we don't change other transitions to the same node if multiple exist
+                if(new_letter.length === 0){
+                    new_letter = "λ";
+                }
                 if (conn.ending_node === ending_node_id && conn.associated_letter === associated_letter) {
                     return { ...conn, associated_letter: new_letter };
                 }
                 return conn;
             });
             return { ...node, connections: updatedConnections };
+            }
         }
         return node;
     });
@@ -415,11 +435,31 @@ export function updateConnection(event: Event, node_id: number, ending_node_id: 
 
 function verify_new_letter_connection(letter:string){
 
-    if(letter.length > 1 || letter.length === 0){
+    // A transition can only be expressed by a single character
+    if(letter.length > 1){
         return false;
-    }else{
-        return true;
     }
+
+    // There cannot be lambda transitions in a DFA
+    if(letter.length === 0 && automaton_type.value === "DFA"){
+        return false;
+    }
+
+    return true;
+}
+
+function check_if_not_repeated(credentials:node_props,associated_letter:string){
+    let found = false;
+    // We  search on all of the connections to determine if there is an already existing connection with that letter
+    let found_connection  = credentials.connections.find((connection)=>connection.associated_letter === associated_letter);
+
+    if(found_connection){
+        // If it is not undefined, then a connection was found
+        found = true;
+    }
+
+    // We return the opposite of found. If there is a connection that exists(found = true) -> we cannot add the specified one
+    return !found;
 }
 
 
@@ -460,16 +500,11 @@ export function change_starting_node_status(event:Event,selected_id:number){
 
     let checked_status = myInput.checked;
 
-    // We go through all of the nodes until we find the selected node
-    // we then modify its credentials
-    if(automaton_type.value === "DFA"){
-        handle_starting_status_DFA(checked_status,selected_id);
-    }else{
-        //NFA automaton logic
-    }
+    // In both DFA and NFA there can only be a single initial state
+    handle_starting_status(checked_status,selected_id);
 }
 
-export function handle_starting_status_DFA(checked_status:boolean,selected_id:number){
+export function handle_starting_status(checked_status:boolean,selected_id:number){
 
     // In a DFA there can only be a single starting node
 
@@ -503,17 +538,13 @@ export function change_final_node_status(event:Event,selected_id:number){
 
     // We go through all of the nodes until we find the selected node
     // we then modify its credentials
-    if(automaton_type.value === "DFA"){
-        handle_final_status_DFA(checked_status,selected_id);
-    }else{
-        //NFA automaton logic
-    }
+    handle_final_status(checked_status,selected_id);
 
 }
 
 
-function handle_final_status_DFA(checked_status:boolean,selected_id:number){
-     // In a DFA there can only be a single final node
+function handle_final_status(checked_status:boolean,selected_id:number){
+     //In both DFA and NFA there can be infinitely many final states
 
     nodes.value = nodes.value.map((node)=>{
         if(node.id === selected_id){
@@ -739,4 +770,23 @@ export function change_automaton_mode(event:Event){
     let chosenOption = mySelector.value as Automaton_type;
 
     automaton_type.value = chosenOption;
+
+    if(automaton_type.value === "DFA" && repeated_letter_in_a_node.value){
+        // This means that there are nodes with repeated transitions which we cannot allow
+        // As a result, we are going to reset all transitions to -1 so that they can be reassigned again
+        reset_transitions();
+    }
+}
+
+function reset_transitions(){
+    nodes.value = nodes.value.map((node)=>{
+        let my_connections = node.connections;
+
+        // We reset all connections to -1
+        my_connections.forEach((conn)=>{
+            conn.associated_letter = "-1";
+        });
+
+        return {...node,connections:my_connections};
+    });
 }

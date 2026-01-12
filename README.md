@@ -13,3 +13,8 @@ Preact application that simulates Finite Automaton
     3. Figure direct and step by step for NFA
 
     4. When connections are drawn from A->B B->A, fix visual connection collision.
+
+
+# To explain
+
+- When turning from NFA to DFA, if repeated transitions are detected, we reset all connections to -1(default value). This way, we avoid incompatibility.
