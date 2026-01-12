@@ -619,15 +619,65 @@ function DFA_word_compute(word:string,starting_node:number){
 
 
 function NFA_word_compute(word:string,starting_node:number){
-    // In this case, my approach is to perform a BFS so that we stop as the 
-    // lowest valid connection
-    let current_node_id = starting_node;
+    // We implement BFS to analyze all the possible paths but stop on the 
+    // shallowest one, to reduce unnecessary computations
 
-    //BFS IMPLEMENTATION
-    
+    // We first see what nodes we can get by just using lambda transitions
+    let current_nodes = get_lambda_nodes([find_node_credentials(starting_node)]);
+
+    for(let letter of word){
+
+        
+
+    }
+
     return false;
 }
 
+
+function get_lambda_nodes(given_nodes:node_props[]){
+
+    let current_nodes = [...given_nodes];
+    let reachable_nodes:node_props[] = [];
+    // The visited set is required to avoid infinite loop
+    // we could have if for example A->B->A
+    let visited_ids = new Set<number>();
+
+    current_nodes.forEach((node)=> {
+        // We set the given nodes to already visited
+        visited_ids.add(node.id);
+
+        // We add them to the resulting list as they can be accessed 
+        // directly without doing anything(no lambda and no letter)
+        reachable_nodes.push(node);
+
+    });
+    
+    while(current_nodes.length > 0){
+
+        // We obtain the first node
+        let current_node = current_nodes.shift() as node_props;
+
+        current_node.connections.forEach((conn)=>{
+            if(!visited_ids.has(conn.ending_node) && conn.associated_letter === "λ"){
+
+                visited_ids.add(conn.ending_node);
+
+                let next_node = find_node_credentials(conn.ending_node);
+
+                // We add the newly found node to the queue and the list of reachable nodes
+                current_nodes.push(next_node);
+                reachable_nodes.push(next_node);
+            }
+
+        });
+        
+
+
+    }
+
+    return reachable_nodes;
+}
 
 export function update_word_to_analyze(event:Event){
     let myInput = event.target as HTMLInputElement;
