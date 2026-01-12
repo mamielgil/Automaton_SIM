@@ -624,14 +624,46 @@ function NFA_word_compute(word:string,starting_node:number){
 
     // We first see what nodes we can get by just using lambda transitions
     let current_nodes = get_lambda_nodes([find_node_credentials(starting_node)]);
-
+   
     for(let letter of word){
+        let to_add_nodes:node_props[] = [];
+        // We include this set to avoid adding repeating nodes for a given letter
+        let visited_nodes = new Set<number>();
 
-        
+        for(let node of current_nodes){
+            
+            // We go through all of the connections for each of the nodes
+            node.connections.forEach((conn)=>{
+
+                if(conn.associated_letter === letter && !visited_nodes.has(conn.ending_node)){
+                    // We mark the node to indicate that it was visited
+                    visited_nodes.add(conn.ending_node);
+                    // We add that node to the list of current nodes
+                    to_add_nodes.push(find_node_credentials(conn.ending_node));
+                }
+            });
+
+        }
+        if(to_add_nodes.length === 0){
+            // This means there was no valid node for the given letter
+            // Therefore we stop and return false as the word was not analyzed fully
+            return false;
+        }
+
+        // We now replace the current_nodes array with the array of the newly visited nodes
+        // plus the nodes that can be accessed through lambda transitions
+        current_nodes = get_lambda_nodes(to_add_nodes);
 
     }
+    let result = false;
 
-    return false;
+    current_nodes.forEach((node)=>{
+        if(node.final_node){
+            result = true;
+        }
+    })
+
+    return result;
 }
 
 
