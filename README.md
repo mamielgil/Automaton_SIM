@@ -11,6 +11,8 @@ Preact application that simulates Finite Automaton
 
     3. When connections are drawn from A->B B->A, fix visual connection collision.
 
+    4. Depending on the automaton type that is currently selected, there is a different explanation in the edit mode.
+
 
 # To explain
 
