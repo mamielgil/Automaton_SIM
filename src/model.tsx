@@ -765,7 +765,22 @@ export function first_step(){
 
 export function compute_step_by_step(){
 
-    //First as we are going to go node through node, selecting them to indicate 
+    if(automaton_type.value === "DFA"){
+        DFA_step_by_step();
+    }else{
+        NFA_step_by_step();
+    }
+
+   
+}
+
+function NFA_step_by_step(){
+    
+}
+
+function DFA_step_by_step(){
+
+     //First as we are going to go node through node, selecting them to indicate 
     // where we are, we need to deselect all of the nodes
     reset_node_selection();
     
@@ -788,7 +803,7 @@ export function compute_step_by_step(){
     // This variable is used to know the previous node name so that
     // we can identify the transition if it is found
     let previous_node = find_node_credentials(to_visit_node);
-    if(automaton_type.value == "DFA"){
+    
         valid_transition = DFA_one_step_compute(letter);
 
         if(valid_transition.ending_node != -1){
@@ -800,15 +815,12 @@ export function compute_step_by_step(){
             result = false;
             word_to_analyze.value = "";
         }
-        
-    }else{
-        // FOR LATER NDA implementation
-    }
     step_by_step_word_resolution.value = "CURRENT NODE " + previous_node.name.toString();
     step_by_step_word_resolution.value += result? " TRANSITION " + previous_node.name.toString() + "->" + find_node_credentials(to_visit_node).name + " (" + letter + ")" :" NO TRANSITION WAS FOUND";
     if(!result){
         to_visit_node = -1;
     }
+
 }
 
 function DFA_one_step_compute(letter:string){

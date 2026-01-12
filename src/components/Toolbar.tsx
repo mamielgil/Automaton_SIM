@@ -1,6 +1,6 @@
 import * as Model from "../model"
 import { MenuOption } from "./MenuOption";
-import { AutomatonMode } from "../AutomatonMode";
+import { AutomatonMode } from "./AutomatonMode";
 export default function Toolbar(){
     
     return(
@@ -10,7 +10,7 @@ export default function Toolbar(){
         <MenuOption onClickHandler={Model.changeDeleteMode} stringLabel="Delete Tool" checked = {Model.is_delete_tool_active.value}></MenuOption>
         <MenuOption onClickHandler={Model.changeEditMode} stringLabel="Edit Node Tool" checked = {Model.is_edit_tool_active.value}></MenuOption>
         <MenuOption onClickHandler={Model.activateWordAnalysis} stringLabel = "Analyze word" checked = {Model.is_word_analysis_active.value}></MenuOption>
-        <AutomatonMode></AutomatonMode>
+        <AutomatonMode disabled = {Model.first_step_performed.value}></AutomatonMode>
         <button class = "w-[100px]"> Save</button>
         </div>
 
