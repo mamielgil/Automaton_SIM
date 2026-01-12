@@ -5,6 +5,10 @@ button{
    @apply border border-black rounded font-serif enabled:hover:bg-blue-600 enabled:active:bg-gray-600 enabled:bg-blue-200;
 }
 
+button:disabled{
+   @apply text-red-600  border-red-600
+}
+
 input {
    @apply border font-serif;
 

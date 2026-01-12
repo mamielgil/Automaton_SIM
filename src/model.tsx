@@ -59,7 +59,11 @@ export const first_step_performed = signal(false);
 
 // This signal is used to keep track of the presence of repeated transitions in a NFA
 // so that when we switch back to DFA the transitions can be reestablished
-export const repeated_letter_in_a_node = signal(false);
+export let repeated_letter_in_a_node = false;
+
+// This signal is used to keep track of the addition of lambda connections in NFA, to avoid 
+// having them when transforming the automaton back to DFA
+export let added_lambda_transition = false;
 
 // Signals that store all of the starting
 // We filter the nodes to find the starting
@@ -71,6 +75,20 @@ let starting_nodes = computed(()=>{
 // This array will store the connection that needs to be created
 let connectionPair  = {starting_node : -1 , ending_node: -1, associated_letter: "-1" };
 
+// Signal that does not allow to perform word computation until
+// all of the transitions have been updated(default -1 removed)
+export const exists_default_transition = computed(()=>{
+    let result = false;
+    nodes.value.forEach((node)=>{
+        // For each node we go through all of its connections
+        node.connections.forEach((conn)=>{
+            if(conn.associated_letter === "-1"){
+                result = true;
+            }
+        });
+    });
+    return result;
+});
 export function changeAddMode(){
     let previous_add = is_add_tool_active.value;
     resetAllButtonSignals();
@@ -407,9 +425,9 @@ export function updateConnection(event: Event, node_id: number, ending_node_id: 
                 // In a NFA we can allow as many repeated connections as we wish
                 can_update = true;
                 // We run the check if not repeated just to update the signal that stores if repeated connections exist
-                if(!repeated_letter_in_a_node.value){
+                if(!repeated_letter_in_a_node){
                     // We just update it if it is not already true
-                repeated_letter_in_a_node.value = !check_if_not_repeated(node,new_letter);
+                repeated_letter_in_a_node = !check_if_not_repeated(node,new_letter);
                 }
             }
             if(can_update){
@@ -419,6 +437,7 @@ export function updateConnection(event: Event, node_id: number, ending_node_id: 
                 // Note: Checking old_letter ensures we don't change other transitions to the same node if multiple exist
                 if(new_letter.length === 0){
                     new_letter = "λ";
+                    added_lambda_transition = true;
                 }
                 if (conn.ending_node === ending_node_id && conn.associated_letter === associated_letter) {
                     return { ...conn, associated_letter: new_letter };
@@ -471,25 +490,23 @@ export function activateWordAnalysis(){
 }
 
 export function compute_word_directly(){
+    if(exists_default_transition.value){
+        // We do not allow computations until all -1 transitions have been removed
+        return;
+    }
+    
     //Depending on which automaton we are dealing with, the algorithm will be different
     let result = false;
     let word = word_to_analyze.value;
-    if(word.length === 0){
-        result = find_node_credentials(starting_nodes.value[0]).final_node; 
-    }else{
-        if(automaton_type.value == "DFA"){
-            result = DFA_word_compute(word,starting_nodes.value[0]);
-            
-                
-                
-            
 
-        }else{
-            //Non deterministic automaton computation
-            result = NFA_word_compute(word,starting_nodes.value[0]);
-        }
-        }
+    if(automaton_type.value == "DFA"){
+        result = DFA_word_compute(word,starting_nodes.value[0]);
         
+    }else{
+        //Non deterministic automaton computation
+        result = NFA_word_compute(word,starting_nodes.value[0]);
+    }
+         
     auto_word_resolution.value = result? "WORD IS VALID" :"WORD IS INVALID";
     // Once the word has been analyzed we reset the value of this signal
     word_to_analyze.value = "";
@@ -587,6 +604,12 @@ export function delete_connection(selected_id:number,to_delete_connection:connec
 }
 
 function DFA_word_compute(word:string,starting_node:number){
+    
+    if(word.length === 0){
+        return find_node_credentials(starting_nodes.value[0]).final_node; 
+    }
+    
+    
     // In this case the algorithm is used considering that in
     // each node, there can only be a single connection with each 
     // letter.
@@ -661,7 +684,7 @@ function NFA_word_compute(word:string,starting_node:number){
         if(node.final_node){
             result = true;
         }
-    })
+    });
 
     return result;
 }
@@ -725,6 +748,12 @@ let to_visit_node:number = -1;
 let step_by_step_timeout: ReturnType<typeof setTimeout>|null = null;
 
 export function first_step(){
+    
+    if(exists_default_transition.value){
+        // We do not allow computations if all default transitions(-1) have not been removed
+        return false;
+    }
+    
     // The first step is finding the starting node so that the algorithm can start
     reset_node_selection();
     first_step_performed.value = true;
@@ -732,19 +761,16 @@ export function first_step(){
 
     if(step_by_step_timeout){
         clearTimeout(step_by_step_timeout);
+        step_by_step_timeout = null;
     }
     
     if(starting_nodes.value.length > 0){
-        to_visit_node = starting_nodes.value[0];
         let node_name = "";
-        nodes.value = nodes.value.map((node)=>{
-        if(node.id === to_visit_node){
-            node_name = node.name;
-            return {...node, selected:true};
+        if(automaton_type.value === "DFA"){
+            node_name = handle_first_step_DFA();
         }else{
-            return {...node, selected:false};
+            node_name = handle_first_step_NFA();
         }
-        });
         let word:string = "-1";
         if(word_to_analyze.value === ""){
             word = "EMPTY STRING";
@@ -757,27 +783,154 @@ export function first_step(){
 }   else{
     // This means that there is no starting node assigned
     step_by_step_word_resolution.value = "NO STARTING NODE FOUND";
-    step_by_step_timeout = setTimeout(()=>{first_step_performed.value = false;},2000);
+    step_by_step_timeout = setTimeout(()=>{
+        first_step_performed.value = false;
+        step_by_step_timeout = null;
+    },2000);
 
     return false;
     }
 }
 
+function handle_first_step_DFA(){
+
+    // I have separated it to highlight the use of to_visit_node for DFA
+    to_visit_node = starting_nodes.value[0];
+    let node_name = "";
+    nodes.value = nodes.value.map((node)=>{
+    if(node.id === to_visit_node){
+        node_name = node.name;
+        return {...node, selected:true};
+    }else{
+        return {...node, selected:false};
+    }
+    });
+
+    return node_name;
+
+}
+
+function handle_first_step_NFA(){
+
+    // I have separated it to highlight the use of to_visit_nodes for NFA
+    to_visit_nodes = [find_node_credentials(starting_nodes.value[0])];
+    let node_name = "";
+    nodes.value = nodes.value.map((node)=>{
+    if(node.id === to_visit_nodes[0].id){
+        node_name = node.name;
+        return {...node, selected:true};
+    }else{
+        return {...node, selected:false};
+    }
+    });
+
+    return node_name;
+
+
+}
+
 export function compute_step_by_step(){
 
-    if(automaton_type.value === "DFA"){
-        DFA_step_by_step();
-    }else{
-        NFA_step_by_step();
+    if(step_by_step_timeout === null){
+        // This means that the computations have not finished
+        // So we can keep executing more steps. When the computations
+        // are finished the timeout is set to null until a first step
+        // is executed again
+        if(automaton_type.value === "DFA"){
+            DFA_step_by_step();
+
+        }else{
+            NFA_step_by_step();
+        }
     }
 
    
 }
 
+// To_visit version for the NFA where we store the nodes in depth level
+// so that they are visited following the BFS order
+let to_visit_nodes:node_props[] = [];
+let word_finished = false;
+
 function NFA_step_by_step(){
+    // First we deselect all nodes so that we know the one that is being visited now
+    reset_node_selection();
+    step_by_step_word_resolution.value = "";
+
+    if(!word_finished){
+    // This only runs when we have not finished processing letters. If we have, then we just want
+    // to analyze the remaining accesible by lambda nodes once. If not some of them could be added several times.
+    to_visit_nodes = get_lambda_nodes(to_visit_nodes);
+    }
+
+    if(word_to_analyze.value.length === 0){
+        word_finished = true;
+        // We select all of the nodes that remain
+        
+        let is_valid = false;
+        let to_select_nodes:number[] = []
+        to_visit_nodes.forEach((node)=>{
+            if(node.final_node){
+                is_valid = true
+                to_select_nodes.push(node.id);
+            }
+
+        });
+        // We select the nodes that are a final state and would lead to validity
+        select_nodes(to_select_nodes);
+        if(is_valid){
+            step_by_step_word_resolution.value = "FINISHED: VALID WORD";
+        
+        }else{
+            step_by_step_word_resolution.value = "FINISHED:INVALID WORD";
+        }
+        reset_step_by_step_NFA();
+        return;
+    }
+
+    // Case in which we need to keep analyzing
+    let letter = word_to_analyze.value[0];
+
+    // We use a set to avoid adding the same nodes several times during the analysis of the same letter
+    let visited_nodes = new Set<number>();
+
+    let to_add_nodes:node_props[] = [];
+
+    // We select all of the nodes that are visited
+    select_nodes(to_visit_nodes.map((node=>node.id)));
+
+    // We select all of the nodes of the same layer
+    to_visit_nodes.forEach((node)=> {
+        
+        step_by_step_word_resolution.value += "VISITED NODE: " + node.name + "\n";
+        // We indicate which nodes were visited and add the valid connections
+        node.connections.forEach((conn)=>{
+
+            if(conn.associated_letter === letter && !visited_nodes.has(conn.ending_node)){
+
+                visited_nodes.add(conn.ending_node);
+                to_add_nodes.push(find_node_credentials(conn.ending_node));
+            }
+        });
     
+    });
+   
+    word_to_analyze.value = word_to_analyze.value.slice(1);
+    to_visit_nodes = to_add_nodes;
+
 }
 
+
+function reset_step_by_step_NFA(){
+    to_visit_nodes = [];
+    word_finished = false;
+    step_by_step_timeout = setTimeout(()=>{
+        first_step_performed.value = false;
+        step_by_step_timeout  = null;
+
+    },3000);
+
+}
 function DFA_step_by_step(){
 
      //First as we are going to go node through node, selecting them to indicate 
@@ -785,14 +938,17 @@ function DFA_step_by_step(){
     reset_node_selection();
     
     if(word_to_analyze.value.length === 0){
-        select_node(to_visit_node);
+        select_nodes([to_visit_node]);
         if(find_node_credentials(to_visit_node).final_node){
         step_by_step_word_resolution.value = "FINISHED: VALID WORD";
         }else{
         step_by_step_word_resolution.value = "FINISHED: INVALID WORD";
         }
         // We force the step by step view to dissapear after 5 seconds
-        step_by_step_timeout = setTimeout(()=>{first_step_performed.value = false;},3000);
+        step_by_step_timeout = setTimeout(()=>{
+            first_step_performed.value = false;
+            step_by_step_timeout = null;
+        },3000);
         return;
     }
     // In this case, we are going to advance letter by letter
@@ -809,7 +965,7 @@ function DFA_step_by_step(){
         if(valid_transition.ending_node != -1){
             // This means that a transition was found
             result = true;
-            select_node(previous_node.id);
+            select_nodes([previous_node.id]);
             
         }else{
             result = false;
@@ -818,6 +974,7 @@ function DFA_step_by_step(){
     step_by_step_word_resolution.value = "CURRENT NODE " + previous_node.name.toString();
     step_by_step_word_resolution.value += result? " TRANSITION " + previous_node.name.toString() + "->" + find_node_credentials(to_visit_node).name + " (" + letter + ")" :" NO TRANSITION WAS FOUND";
     if(!result){
+        // Transition was not found so we reset the parameter
         to_visit_node = -1;
     }
 
@@ -837,7 +994,7 @@ function DFA_one_step_compute(letter:string){
         // This means that a valid transition was found
         to_visit_node = valid_transition.ending_node;
         // We reduce one letter of the word
-        word_to_analyze.value = word_to_analyze.value.slice(1,word_to_analyze.value.length);
+        word_to_analyze.value = word_to_analyze.value.slice(1);
         
         
         return valid_transition;
@@ -846,9 +1003,9 @@ function DFA_one_step_compute(letter:string){
         return {ending_node:-1,associated_letter:"-1",ending_name:"-1"}; 
 }
 
-function select_node(node_id:number){
+function select_nodes(node_ids:number[]){
     nodes.value = nodes.value.map((node)=>{
-        if(node.id == node_id){
+        if(node_ids.includes(node.id)){
             return{...node,selected:true};
             
         }else{
@@ -865,7 +1022,7 @@ export function change_automaton_mode(event:Event){
 
     automaton_type.value = chosenOption;
 
-    if(automaton_type.value === "DFA" && repeated_letter_in_a_node.value){
+    if(automaton_type.value === "DFA" && (repeated_letter_in_a_node || added_lambda_transition)){
         // This means that there are nodes with repeated transitions which we cannot allow
         // As a result, we are going to reset all transitions to -1 so that they can be reassigned again
         reset_transitions();
