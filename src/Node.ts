@@ -9,6 +9,9 @@ export default class Node{
     myconnections:connection_props[];
     starting_node:boolean;
     final_node:boolean;
+    connections_total_string: Map<number,string>;
+    connection_already_drawn:Map<number,boolean>;
+
     constructor({id,name,pos_x,pos_y,selected,connections,starting_node,final_node}:node_props){
         this.my_id = id;
         this.name = name;
@@ -18,6 +21,24 @@ export default class Node{
         this.myconnections = connections;
         this.starting_node = starting_node;
         this.final_node = final_node;
+        // The first map stores the combined string that will be drawn on the canvas
+        // to characterize the connections from two specific nodes(in a single direction
+        this.connections_total_string = new Map();
+
+        // The second map stores for each ending_node whether the connection was already drawn or not
+        // we avoid unnecessary calls to the draw connection method
+        this.connection_already_drawn = new Map();
+
+        this.myconnections.forEach((conn)=>{
+            if(!this.connections_total_string.get(conn.ending_node)){
+                // We initialize all the counter of connections to other nodes to 0
+                this.connections_total_string.set(conn.ending_node,conn.associated_letter);
+            }else{
+                let current_string = this.connections_total_string.get(conn.ending_node) as string;
+                this.connections_total_string.set(conn.ending_node,current_string + ", " + conn.associated_letter);
+            }
+            this.connection_already_drawn.set(conn.ending_node,false);
+        })
 
     }
 
@@ -64,27 +85,34 @@ export default class Node{
     draw_connections(gc:CanvasRenderingContext2D){
         // We go through each of the connections and draw the arrow
 
+        // We set the line to start at the center of our node
+        gc.save();
+        gc.lineWidth = 1;
+        gc.strokeStyle = "black";
+        gc.font = "14px sans-serif";
+
         this.myconnections.forEach((connection)=>{
 
-            // We set the line to start at the center of our node
-            gc.save();
-            gc.lineWidth = 1;
-            gc.strokeStyle = "black";
-            gc.font = "14px sans-serif";
+            
 
             if(connection.ending_node != this.my_id){
-            
+                let current_value = this.connection_already_drawn.get(connection.ending_node) as boolean;
+                
+                if(!current_value){
                 // This is the way to draw the connections as long as it is with another node
-                this.draw_to_other_node_connection(gc,connection);
-
+                // and only a single connection exists
+                this.draw_to_other_node_connection(gc,connection,this.connections_total_string.get(connection.ending_node) as string);
+                this.connection_already_drawn.set(connection.ending_node,true);
+            
+                }
             }else{
                 // This method draws the connections that a node has to itself
-                this.draw_cycle_connection(gc,connection);
+                this.draw_cycle_connection(gc,this.connections_total_string.get(connection.ending_node) as string);
             }
             
-        gc.restore();
-        })
+        });
 
+        gc.restore();
     }
 
     draw_starting_arrow(gc:CanvasRenderingContext2D,stroke_style:string){
@@ -108,13 +136,12 @@ export default class Node{
         gc.restore();
     }
 
-    draw_to_other_node_connection(gc:CanvasRenderingContext2D,connection:connection_props){
+    draw_to_other_node_connection(gc:CanvasRenderingContext2D,connection:connection_props,transition_string:string){
 
             gc.save();
             // We now find the credentials of the ending node(we take the first element though there is always
             // going to be a single node that is returned in the filter function)
-
-            let ending_node_credentials = Model.nodes.value.filter((node)=> node.id === connection.ending_node)[0];
+            let ending_node_credentials = Model.find_node_credentials(connection.ending_node);
             let computed_values = this.compute_starting_ending_point_connection(this.my_x,this.my_y,ending_node_credentials.pos_x,ending_node_credentials.pos_y);
             gc.beginPath();
             gc.moveTo(computed_values.initial_x,computed_values.initial_y);
@@ -123,15 +150,33 @@ export default class Node{
             // We call a method that allows to draw the line in the outer bound of the node
             let middle_point_x = this.my_x + computed_values.unit_vector.x * (computed_values.distance / 2)
             let middle_point_y = this.my_y + computed_values.unit_vector.y * (computed_values.distance/ 2);
+            gc.strokeStyle = "black";
 
-            gc.strokeText(connection.associated_letter,middle_point_x - 5, middle_point_y - 5);
+            let start_y = computed_values.initial_y;
+            let end_y = computed_values.final_y;
+            let start_x = computed_values.initial_x;
+            let end_x = computed_values.final_x;
+
+            gc.save();
+            // We save here again to avoid propagating the rotation and transformation changes
+            gc.translate(middle_point_x,middle_point_y);
+            let angle = Math.atan2(end_y - start_y, end_x - start_x);
+            gc.rotate(angle);
+
+            if (Math.abs(angle) > Math.PI / 2) {
+            gc.rotate(Math.PI); // Rotate another 180 degrees
+        }   gc.textAlign = "center";
+            gc.strokeText(transition_string,0, -5);
+            gc.restore();
+
             gc.stroke();
             gc.closePath();
+            gc.restore();
             this.draw_arrow_head(gc, computed_values.initial_x, computed_values.initial_y, computed_values.final_x, computed_values.final_y,"black");
             
-            gc.restore();
+            
     }
-    draw_cycle_connection(gc:CanvasRenderingContext2D,connection_data:connection_props){
+    draw_cycle_connection(gc:CanvasRenderingContext2D,transition_string:string){
 
         gc.save();
         gc.strokeStyle = "black";
@@ -147,11 +192,11 @@ export default class Node{
         // We draw the label that characterizes this particular connection
 
         // We center the text by removing half of its width to the coordinate x
-        let label_x = this.my_x - gc.measureText(connection_data.associated_letter).width / 2;
+        let label_x = this.my_x - gc.measureText(transition_string).width / 2;
 
         // We draw it on top of the connection
         let label_y = this.my_y - 2 * Model.NODE_RADIUS - 5;
-        gc.strokeText(connection_data.associated_letter,label_x,label_y);
+        gc.strokeText(transition_string,label_x,label_y);
         gc.restore();
 
     }
