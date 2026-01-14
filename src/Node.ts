@@ -1,4 +1,3 @@
-import { computed } from "@preact/signals";
 import { type node_props, type connection_props} from "./model";
 import * as Model from "./model";
 export default class Node{
