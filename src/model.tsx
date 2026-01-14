@@ -20,6 +20,7 @@ export type connection_props = {
     ending_name:string;
     // Letter that characterizes this transition
     associated_letter:string;
+    connection_id:number;
 
 }
 
@@ -30,6 +31,9 @@ export const automaton_type = signal<Automaton_type>("DFA");
 export let nodes = signal<node_props[]>([]);
 
 let node_id:number = 0;
+
+// Connection_id is used to univocally identify each connection so that we can update them accordingly
+let connection_id:number = 0;
 export const show_connection_popup = signal(false);
 export const is_add_tool_active = signal(false);
 export const is_delete_tool_active = signal(false);
@@ -73,7 +77,7 @@ let starting_nodes = computed(()=>{
 });
 
 // This array will store the connection that needs to be created
-let connectionPair  = {starting_node : -1 , ending_node: -1, associated_letter: "-1" };
+let connectionPair  = {starting_node : -1 , ending_node: -1, associated_letter: "-1",connection_id:-1};
 
 // Signal that does not allow to perform word computation until
 // all of the transitions have been updated(default -1 removed)
@@ -208,7 +212,7 @@ function handle_connection_option(event:MouseEvent){
 
                 } else{
                     // In this case, we need to reset the previous connection to establish the new one
-                    connectionPair = {starting_node: collided_id, ending_node: -1, associated_letter: "-1"}
+                    connectionPair = {starting_node: collided_id, ending_node: -1, associated_letter: "-1",connection_id:-1};
 
 
                     // We set the clicked node to a different color so that the user knows that it was selected
@@ -346,7 +350,8 @@ function create_connection(starting_node:number,end_node:number,end_name:string,
     // We know that the passed ids exist therefore, we just perform a for each
     nodes.value.forEach((node)=>{
         if(node.id == starting_node){
-            let myConnection = {ending_node: end_node,ending_name:end_name,associated_letter:my_letter};
+            let myConnection = {ending_node: end_node,ending_name:end_name,associated_letter:my_letter,connection_id:connection_id};
+            connection_id++;
             node.connections =  [...node.connections, myConnection];
             // We update the reference so that the update is noticed by the engine
             nodes.value = [...nodes.value];
@@ -400,7 +405,7 @@ export function updateNodeName(e:Event,selected_id:number){
 
 }
 
-export function updateConnection(event: Event, node_id: number, ending_node_id: number, associated_letter: string) {
+export function updateConnection(event: Event,given_node_id:number,given_connection_id:number) {
     
     // We take the new value of the input tag and update the connection accordingly
     const inputField = event.target as HTMLInputElement;
@@ -415,7 +420,7 @@ export function updateConnection(event: Event, node_id: number, ending_node_id: 
     if(verify_new_letter_connection(new_letter)){
     // We map through nodes to find the specific node, then map through its connections
     nodes.value = nodes.value.map((node) => {
-        if (node.id === node_id) {
+        if (node.id === given_node_id) {
             
             // For a DFA we can only have a single connection for a given letter
             let can_update = true;
@@ -434,12 +439,12 @@ export function updateConnection(event: Event, node_id: number, ending_node_id: 
             // Found the node, now update its connections
             const updatedConnections = node.connections.map((conn) => {
                 // We identify the specific connection to update
-                // Note: Checking old_letter ensures we don't change other transitions to the same node if multiple exist
+            
                 if(new_letter.length === 0){
                     new_letter = "λ";
                     added_lambda_transition = true;
                 }
-                if (conn.ending_node === ending_node_id && conn.associated_letter === associated_letter) {
+                if (conn.connection_id === given_connection_id) {
                     return { ...conn, associated_letter: new_letter };
                 }
                 return conn;
@@ -1000,7 +1005,7 @@ function DFA_one_step_compute(letter:string){
         return valid_transition;
     }
     // This matches the cases in which no valid transition was found
-        return {ending_node:-1,associated_letter:"-1",ending_name:"-1"}; 
+        return {ending_node:-1,associated_letter:"-1",ending_name:"-1",connection_id:-1}; 
 }
 
 function select_nodes(node_ids:number[]){

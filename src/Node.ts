@@ -1,3 +1,4 @@
+import { computed } from "@preact/signals";
 import { type node_props, type connection_props} from "./model";
 import * as Model from "./model";
 export default class Node{
@@ -150,7 +151,6 @@ export default class Node{
             // We call a method that allows to draw the line in the outer bound of the node
             let middle_point_x = this.my_x + computed_values.unit_vector.x * (computed_values.distance / 2)
             let middle_point_y = this.my_y + computed_values.unit_vector.y * (computed_values.distance/ 2);
-            gc.strokeStyle = "black";
 
             let start_y = computed_values.initial_y;
             let end_y = computed_values.final_y;
@@ -166,7 +166,19 @@ export default class Node{
             if (Math.abs(angle) > Math.PI / 2) {
             gc.rotate(Math.PI); // Rotate another 180 degrees
         }   gc.textAlign = "center";
-            gc.strokeText(transition_string,0, -5);
+            // Depending on whether the connection is going left or right we draw the text up or down
+            let y_bias_for_stroke = 0;
+            if(computed_values.final_x  > computed_values.initial_x){
+                // This means it goes to the right
+                gc.strokeStyle = "green";
+                y_bias_for_stroke = -5;
+
+            }else{
+                // This means it goes to the right
+                gc.strokeStyle = "red";
+                y_bias_for_stroke = 14;
+            }
+            gc.strokeText(transition_string,0, y_bias_for_stroke);
             gc.restore();
 
             gc.stroke();

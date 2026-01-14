@@ -19,7 +19,7 @@ export function NodeEditor(){
         <label>Connections: </label>
         {selected_node_data.connections.map((connection)=>{
             let my_string = selected_node_data.id.toString() + "-> " + connection.ending_name;
-            return(<div class = "flex box-border gap-[5px]"><NodeEditorOption my_label = {my_string} my_value_input = {connection.associated_letter} onInputHandler={(event)=> Model.updateConnection(event as Event,selected_node_data.id,connection.ending_node,connection.associated_letter)}></NodeEditorOption>
+            return(<div class = "flex box-border gap-[5px]"><NodeEditorOption my_label = {my_string} my_value_input = {connection.associated_letter} onInputHandler={(event)=> Model.updateConnection(event as Event,selected_node_data.id,connection.connection_id)}></NodeEditorOption>
             <button class = "grow" onClick = {()=>Model.delete_connection(selected_node_data.id,connection)}>Delete</button></div>);
         })}
        
