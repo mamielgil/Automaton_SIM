@@ -7,13 +7,8 @@ Preact application that simulates Finite Automaton
         - Delete node -> red colour
         - None selected -> default cursor
 
-    2. When connections are drawn from A->B B->A, fix visual connection collision.
-
-    3. Lengthen explanations when NFA step by step analysis
-
-
 # To explain
 
 - When turning from NFA to DFA, if repeated transitions are detected, we reset all connections to -1(default value). This way, we avoid incompatibility.
 
-- Depending on to which side the arrow goes to we draw the text above or below the edge(connection). Moreover, **green** represents right and **left** represents connections to the left. On the other hand, cycles are represented with black.
+- Depending on to which side the arrow goes to we draw the text above or below the edge(connection). Moreover, **green** represents right and **left** represents connections to the left. On the other hand, **cycles** are represented with black.
