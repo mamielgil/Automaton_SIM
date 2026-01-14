@@ -7,7 +7,7 @@ export function NodeEditor(){
     // This component will appear in the program when a
     // single node is selected, allowing to modify its data
     let selected_node_data: Model.node_props = {id:-1,name: "-1",pos_x:-1,pos_y:-1,selected:false,connections:[],starting_node:false,final_node:false};
-    
+
     selected_node_data = Model.find_selected_credentials();
     return(
         Model.is_edit_tool_active.value && selected_node_data.id != -1 ? <div class = "flex flex-col box-border w-[200px] bg-white pr-[5px] border min-h-0 p-[5px] gap-[10px]">
@@ -22,7 +22,7 @@ export function NodeEditor(){
             return(<div class = "flex box-border gap-[5px]"><NodeEditorOption my_label = {my_string} my_value_input = {connection.associated_letter} onInputHandler={(event)=> Model.updateConnection(event as Event,selected_node_data.id,connection.ending_node,connection.associated_letter)}></NodeEditorOption>
             <button class = "grow" onClick = {()=>Model.delete_connection(selected_node_data.id,connection)}>Delete</button></div>);
         })}
-        
+       
         </div> : null
 
 

@@ -9,9 +9,7 @@ Preact application that simulates Finite Automaton
 
     2. When connections are drawn from A->B B->A, fix visual connection collision.
 
-    3. Depending on the automaton type that is currently selected, there is a different explanation in the edit mode.
-
-    4. Lengthen explanations when NFA step by step analysis
+    3. Lengthen explanations when NFA step by step analysis
 
 
 # To explain
