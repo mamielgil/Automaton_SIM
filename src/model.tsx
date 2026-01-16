@@ -106,18 +106,18 @@ export let cursor_image = computed(()=>{
     
     if(is_add_tool_active.value){
 
-        return "url('add_cursor.png') 16 16, crosshair";
+        return "cursor-[url('add_cursor.png')_16_16,_crosshair]";
     }else if(is_delete_tool_active.value){
 
-        return "url('add_cursor.png') 16 16, auto";
+        return "cursor-[url('delete_cursor.png')_16_16,_auto]";
     }else if(is_connections_tool_active.value){
 
-        return "url('add_cursor.png') 16 16, auto";
+        return "cursor-[url('connection_cursor.png')_16_16,_auto]";
 
     }else if(is_edit_tool_active.value){
-        return "auto";
+        return "cursor-[url('edit_cursor.png')_16_16,_auto]";
     }else{
-        return"auto";
+        return"cursor-auto";
     }
 });
 export function noOptionActive(){

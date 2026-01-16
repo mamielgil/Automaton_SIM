@@ -6,6 +6,7 @@ export function Canvas(){
 
     let canvasRef = useRef<HTMLCanvasElement>(null);
     let containerRef = useRef<HTMLDivElement>(null);
+    let canvasClass = "flex grow box-border min-h-0 " + Model.cursor_image.value;
        // We define a method to resize the Canvas
     function resizeCanvas(){
 
@@ -56,7 +57,7 @@ export function Canvas(){
     }
     }
     return(
-        <div ref = {containerRef} class =  "flex grow box-border min-h-0">
+        <div ref = {containerRef} class =  {canvasClass}>
         <canvas class = "border bg-gray-400 w-full h-full grow" ref = {canvasRef} onClick = {Model.handleCanvasClick}
         onMouseDown={Model.handleCanvasDrag} onMouseUp={Model.handleCanvasDrag} onMouseMove={Model.handleCanvasDrag} > </canvas>
         </div>

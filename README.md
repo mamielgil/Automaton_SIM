@@ -2,12 +2,7 @@
 Preact application that simulates Finite Automaton
 
 # Reminders and to-dos
-    1. Change mouse cursor colour depending on the active signal
-        - Add node -> light green colour
-        - Delete node -> red colour
-        - None selected -> default cursor
-
-    2. Save automaton functionality
+    1. Save automaton functionality
 
 # To explain
 
@@ -16,3 +11,5 @@ Preact application that simulates Finite Automaton
 - Depending on to which side the arrow goes to we draw the text above or below the edge(connection). Moreover, **green** represents right and **left** represents connections to the left. On the other hand, **cycles** are represented with black.
 
 -Connections are created with a default value that  must be changed of -1.
+
+- Customs images were created for each of the different options: add connection, add,delete and edit nodes. These cursors are applied when the user is on the canvas. The customs cursor images are located in the public directory of the project.
