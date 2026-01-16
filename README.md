@@ -6,6 +6,8 @@ Preact application that simulates Finite Automaton
     
     2. Being able to load an automaton file by clicking the load button.
 
+    3. Image that characterizes the tab of the website must be changed
+
 # To explain
 
 - When turning from NFA to DFA, if repeated transitions are detected, we reset all connections to -1(default value). This way, we avoid incompatibility.
