@@ -2,7 +2,9 @@
 Preact application that simulates Finite Automaton
 
 # Reminders and to-dos
-    1. Save automaton functionality
+    1. Save automaton structure by clicking the save button.
+    
+    2. Being able to load an automaton file by clicking the load button.
 
 # To explain
 

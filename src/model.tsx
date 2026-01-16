@@ -1065,3 +1065,9 @@ function reset_transitions(){
         return {...node,connections:my_connections};
     });
 }
+
+
+export function saveAutomaton(){
+    // TO DO FUNCTION-> TAKES THE CURRENT AUTOMATON AND 
+    // STORES IT IN A FILE SO THAT IT CAN BE OPENED LATER
+}

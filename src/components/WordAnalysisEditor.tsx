@@ -18,7 +18,7 @@ export function WordAnalysisEditor(){
         "6. Some states for which certain input symbols have no edge are allowed";
 
     return(
-        Model.is_word_analysis_active.value ? <div class = "flex flex-col box-border w-[200px] bg-white pr-[5px] border min-h-0 p-[5px] gap-[10px] overflow-auto">
+        Model.is_word_analysis_active.value ? <div class = "flex flex-col box-border w-[200px] bg-white pr-[5px] border min-h-0 p-[5px] gap-[15px] overflow-auto">
         <NodeEditorOption my_label="Word to analyze:" my_value_input="" disabled = {Model.first_step_performed.value} onInputHandler={(event)=>Model.update_word_to_analyze(event)}></NodeEditorOption>
         <div class = "flex flex-col box-border gap-[10px]">
         <label class = "pl-[40px]">{Model.auto_word_resolution.value}</label>
