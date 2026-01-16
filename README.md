@@ -7,6 +7,8 @@ Preact application that simulates Finite Automaton
         - Delete node -> red colour
         - None selected -> default cursor
 
+    2. Save automaton functionality
+
 # To explain
 
 - When turning from NFA to DFA, if repeated transitions are detected, we reset all connections to -1(default value). This way, we avoid incompatibility.

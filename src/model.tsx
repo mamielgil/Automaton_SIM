@@ -101,6 +101,25 @@ export function changeAddMode(){
     
 
 }
+
+export let cursor_image = computed(()=>{
+    
+    if(is_add_tool_active.value){
+
+        return "url('add_cursor.png') 16 16, crosshair";
+    }else if(is_delete_tool_active.value){
+
+        return "url('add_cursor.png') 16 16, auto";
+    }else if(is_connections_tool_active.value){
+
+        return "url('add_cursor.png') 16 16, auto";
+
+    }else if(is_edit_tool_active.value){
+        return "auto";
+    }else{
+        return"auto";
+    }
+});
 export function noOptionActive(){
     return !is_add_tool_active.value && !is_delete_tool_active.value && !is_connections_tool_active.value && !is_edit_tool_active.value && !is_word_analysis_active.value;
 }
