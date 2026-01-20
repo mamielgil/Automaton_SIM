@@ -7,7 +7,7 @@ Based on the utilization of JFLAP during my Automaton course, I decided to imple
 
 ## Tools
 
-To model an automaton, the user must draw the nodes on the provided canvas(greyish area) located below  the toolbar. To do so, the user needs to work with the different tools provided above.
+To model an automaton, the user must draw the nodes on the provided canvas(greyish area) located below  the toolbar. To do so, the user needs to work with the different tools explained below.
 
 Each of the tools are activated by clicking on the designated radio button.
 
