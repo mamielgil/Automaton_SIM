@@ -78,7 +78,9 @@ if this option is active, a menu will be displayed. The user can determine wheth
 
 - When turning from NFA to DFA, if repeated transitions are detected, we reset all connections to -1(default value). This way, we avoid incompatibility.
 
-6. **Automaton-mode tool** -> 
+### 6.Automaton-mode tool
+
+This tool allows to switch between a DFA(Deterministic Finite Automaton) and a NFA(Non Deterministic Finite Automaton).
 
 
 
