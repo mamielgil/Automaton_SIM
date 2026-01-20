@@ -89,6 +89,7 @@ Depending on the current chosen automaton, the analyze word menu will display a 
 **If the user attempts to switch from NFA  to DFA mode, if there are lambda transitions or repeated letters for a given node, all connections will be resetted to the default value(-1) to avoid incompatibility issues.**
 
 **Automaton mode selector**
+
 ![Automaton Mode Selector](/assets/Automaton_mode1.png)
 
 **Connection reset after incompatible switch NFA->DFA**
