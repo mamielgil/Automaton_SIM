@@ -131,11 +131,12 @@ cd Automaton_SIM
 ```
 
 4. **Install the dependencies and run the project locally**
-Within your favourite Node.js IDE run:
+within your favourite Node.js IDE or in the terminal run:
 ```bash
 npm install
 npm run dev
 ```
+
 
 5. Enjoy!
 
