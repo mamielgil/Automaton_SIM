@@ -3,7 +3,7 @@ Preact application that simulates Finite Automaton
 
 # Explanation
 
-Based on the utilization of JFLAP during my Automaton course, I decided to implement a simplified version of JFLAP by using Preact. It allows to model deterministic and non deterministic finite automaton.
+Based on the utilization of JFLAP during my Automaton course, I decided to implement a simplified version of JFLAP by using Preact. It allows to model Deterministic and Non Deterministic Finite Automaton.
 
 ## Tools
 
