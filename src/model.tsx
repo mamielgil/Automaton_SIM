@@ -26,6 +26,12 @@ export type connection_props = {
 
 export type Automaton_type =  "DFA" | "NFA";
 
+type SaveData = {
+        nodes:node_props[];
+        automaton_type: Automaton_type;
+
+}
+
 export const automaton_type = signal<Automaton_type>("DFA");
 
 export let nodes = signal<node_props[]>([]);
@@ -166,13 +172,13 @@ export function handleCanvasClick(e:Event){
         
         handle_connection_option(e as MouseEvent);
     }else{
+        
         handle_no_option(e as MouseEvent);
     }
 }
 
 let drag_translator = new DragTranslator();
 let to_drag_node = signal(-1);
-
 export function handleCanvasDrag(e:Event){
 
     // We are only going to allow the nodes to be dragged if there is
@@ -181,13 +187,16 @@ export function handleCanvasDrag(e:Event){
     let event:MouseEvent = e as MouseEvent;
     if(event.type == "mousedown"){
         // If a node is clicked it is possible that it will be dragged
-        to_drag_node.value = find_clicked_node(event.offsetX,event.offsetY);
-        if(to_drag_node.value != -1){
-            change_node_color(to_drag_node.value);
-        }
+        to_drag_node.value = find_clicked_node(event.offsetX,event.offsetY).id;
+        
+        
     }
     let translated_event = drag_translator.translate_event(event);
     if(translated_event.type == "drag"){
+        if(to_drag_node.value != -1){
+            // We only selected the node so that it can be appreciated if the event is drag
+            change_node_color(to_drag_node.value);
+        }
         change_node_pos(event.target as HTMLElement,to_drag_node.value,translated_event.x,translated_event.y);
     }
     }
@@ -195,10 +204,14 @@ export function handleCanvasDrag(e:Event){
 }
 
 function handle_no_option(event:MouseEvent){
-    let collided_id = find_clicked_node(event.offsetX,event.offsetY);
+    let collided_node = find_clicked_node(event.offsetX,event.offsetY);
+    let previous_selection = collided_node.selected;
     reset_node_selection();
-    if(collided_id != -1){
-        change_node_color(collided_id);
+    if(collided_node.id != -1){
+        if(!previous_selection){
+
+        change_node_color(collided_node.id);
+        }
     }
 }
 
@@ -212,30 +225,30 @@ export function handleToolbarClick(e:Event){
 function handle_connection_option(event:MouseEvent){
 
     // We determine if we selected one node to create the connection
-        let collided_id = find_clicked_node(event.offsetX,event.offsetY);
+        let collided_node = find_clicked_node(event.offsetX,event.offsetY);
 
-            if(collided_id != -1){
+            if(collided_node.id != -1){
                 if(connectionPair.starting_node == -1){
                     reset_node_selection();
                     // This means that it is the first node that was clicked
-                connectionPair.starting_node = collided_id;
+                connectionPair.starting_node = collided_node.id;
                 // To identify that this node was selected, we are going to change its color
-                change_node_color(collided_id);
+                change_node_color(collided_node.id);
 
                 }else if( connectionPair.ending_node == -1){
                     // This means that it is the second node that was clicked
-                    connectionPair.ending_node = collided_id;
-                    let credentials: node_props = find_node_credentials(collided_id);
+                    connectionPair.ending_node = collided_node.id;
+                    let credentials: node_props = find_node_credentials(collided_node.id);
                     create_connection(connectionPair.starting_node,connectionPair.ending_node,credentials.name,connectionPair.associated_letter);
                     reset_node_selection();
 
                 } else{
                     // In this case, we need to reset the previous connection to establish the new one
-                    connectionPair = {starting_node: collided_id, ending_node: -1, associated_letter: "-1",connection_id:-1};
+                    connectionPair = {starting_node: collided_node.id, ending_node: -1, associated_letter: "-1",connection_id:-1};
 
 
                     // We set the clicked node to a different color so that the user knows that it was selected
-                    change_node_color(collided_id);
+                    change_node_color(collided_node.id);
                 }
             
             
@@ -302,10 +315,10 @@ function reset_node_selection(){
 }
 function handle_delete_option(event:MouseEvent){
 
-    let collided_id = find_clicked_node(event.offsetX,event.offsetY); 
-        if(collided_id != -1){
+    let collided_node = find_clicked_node(event.offsetX,event.offsetY); 
+        if(collided_node.id != -1){
             // This means that the hitTest yielded true for some node
-            delete_node(collided_id);
+            delete_node(collided_node.id);
         }
 
 }
@@ -315,19 +328,19 @@ function handle_delete_option(event:MouseEvent){
     function find_clicked_node(clicked_x:number,clicked_y:number){
         // We go through all of the nodes and analyze if there was a node that was clicked
 
-        let collided_id:number = -1;
+        let collided_node:node_props = {id:-1,final_node:false,starting_node:false,name:"-1",pos_x:-1,pos_y:-1,selected:false,connections:[]};
         nodes.value.forEach((node)=>{
             if(clicked_x >= node.pos_x - NODE_RADIUS && clicked_x <= node.pos_x + NODE_RADIUS){
                 // This means that the click is in a valid x location so we now analyze y
 
                 if(clicked_y <= node.pos_y + NODE_RADIUS && clicked_y >= node.pos_y - NODE_RADIUS ){
                     // This means that it collided with this node so we take its id
-                    collided_id = node.id;
+                    collided_node = node;
                 }
             }
 
         });
-    return collided_id;
+    return collided_node;
     }
 export function create_node(x:number,y:number){
     let new_node_info:node_props = {id:node_id,name: node_id.toString(), pos_x: x, pos_y: y, selected:false,connections:[],starting_node:false,final_node:false};
@@ -1066,8 +1079,147 @@ function reset_transitions(){
     });
 }
 
-
 export function saveAutomaton(){
-    // TO DO FUNCTION-> TAKES THE CURRENT AUTOMATON AND 
-    // STORES IT IN A FILE SO THAT IT CAN BE OPENED LATER
+
+    // To save the automaton we need to store the value of the nodes signal
+    // the automaton type and the current ids so that the functionality of the automaton
+    // works correctly even if we load it again
+
+    let toSaveData:SaveData = {
+        nodes:nodes.value,
+        automaton_type: automaton_type.value,
+        
+    };
+
+    // We transform the data into a string object
+    const saveJSON = JSON.stringify(toSaveData,null,2);
+
+    // We create the blob object that encapsulates the data to save
+    const myBlob = new Blob([saveJSON],{type:"application/json"});
+
+    // We create an invisible HTML object and assign it to the blob
+    // we simulate that we click it so that the file is downloaded
+    const blobLink:HTMLAnchorElement = document.createElement("a");
+    blobLink.href = URL.createObjectURL(myBlob);
+    blobLink.download = "myautomaton.json";
+    document.body.appendChild(blobLink);
+    blobLink.click();
+
+    // Cleanup of the created HTML element used for the download
+    document.body.removeChild(blobLink);
+    URL.revokeObjectURL(blobLink.href);
+
 }
+
+
+
+export async function loadAutomaton(e:Event){
+
+
+    let myInput = e.target as HTMLInputElement;
+
+    // We obtain the files the user selected.
+    let myFiles = myInput.files;
+
+    if(!myFiles || myFiles.length === 0){
+        // If it is not defined or there was no file selected, we do not perform any function
+
+        return;
+    }
+
+    // Regardless of the amount of files that were selected, we are
+    // always going to load the first file
+    let myFile = myFiles[0];
+    let format_correct = true;
+    // HERE WE MUST PERFORM THE LOAD CHECK
+
+    try{
+        let myFileContent = await myFile.text();
+
+        let myAutomaton = JSON.parse(myFileContent);
+        let fileAutomatonType = myAutomaton.automaton_type;
+
+        if(!myAutomaton.nodes || !myAutomaton.automaton_type){
+                // If any of the attributes of the SaveData type are not defined, then the file
+                // will not be loaded
+                format_correct = false;
+        }else{
+            
+            if(fileAutomatonType != "DFA" && fileAutomatonType != "NFA"){
+                format_correct = false;
+            }    
+        
+        }
+
+        if(format_correct){
+
+          
+            // If the format is correct, now we obtain the updated info based on the 
+            // file data
+            let updatedInfo = loadNodesFromJSON(myAutomaton.nodes);
+            
+            if(updatedInfo.lambda || updatedInfo.repeated_letter){
+                // If there was a repeated letter or a lambda transition detected,
+                // we know the automaton can only be a NFA
+                automaton_type.value = "NFA";
+            }else{
+                // If not we can assign it to the automaton type specified within the file
+                automaton_type.value = fileAutomatonType;
+            }
+            nodes.value = updatedInfo.updated_nodes;
+            resetAllButtonSignals();
+
+            word_to_analyze.value = "";
+
+            first_step_performed.value = false;
+
+            step_by_step_word_resolution.value = "";
+
+            added_lambda_transition = updatedInfo.lambda;
+
+            repeated_letter_in_a_node = updatedInfo.repeated_letter;
+            }
+
+        
+            
+
+    }catch(error){
+        return;
+
+    }
+    
+
+    
+}
+
+function loadNodesFromJSON(loaded_nodes:node_props[]){
+        node_id = 0;
+        connection_id = 0;
+        let has_lambda = false;
+        let has_repeated_letter = false;
+
+        // We reset the ids and reestablish all connections with new ids to force univocal ids
+
+        loaded_nodes.forEach((node)=>{
+            node.id = node_id++;
+            let current_letters_in_connections = new Set<string>();
+            node.connections.forEach((conn)=>{
+                conn.connection_id = connection_id++;
+                if(conn.associated_letter === "λ"){
+                    has_lambda = true;
+                }
+
+                if(current_letters_in_connections.has(conn.associated_letter)){
+                    // This means a given node has several connections with the same letter
+                    has_repeated_letter = true;
+
+                }else{
+                    // If it was not previously contained, we add it
+                    current_letters_in_connections.add(conn.associated_letter);
+                }
+            });
+        });
+
+        return {updated_nodes: loaded_nodes, lambda: has_lambda, repeated_letter:has_repeated_letter};
+}       
+

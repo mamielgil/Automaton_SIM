@@ -8,10 +8,11 @@ export default function Toolbar(){
         <MenuOption onClickHandler={Model.changeConnectionMode} stringLabel= "Add connection" checked = {Model.is_connections_tool_active.value}></MenuOption>
         <MenuOption onClickHandler={Model.changeAddMode} stringLabel="Add Tool" checked = {Model.is_add_tool_active.value}></MenuOption>
         <MenuOption onClickHandler={Model.changeDeleteMode} stringLabel="Delete Tool" checked = {Model.is_delete_tool_active.value}></MenuOption>
-        <MenuOption onClickHandler={Model.changeEditMode} stringLabel="Edit Node Tool" checked = {Model.is_edit_tool_active.value}></MenuOption>
+        <MenuOption onClickHandler={Model.changeEditMode} stringLabel="Edit Node" checked = {Model.is_edit_tool_active.value}></MenuOption>
         <MenuOption onClickHandler={Model.activateWordAnalysis} stringLabel = "Analyze word" checked = {Model.is_word_analysis_active.value}></MenuOption>
         <AutomatonMode disabled = {Model.first_step_performed.value}></AutomatonMode>
-        <button class = "w-[100px]"> Save</button>
+        <button class = "w-[200px]" onClick={Model.saveAutomaton}> Save</button>
+        <input type = "file" class = "w-full" onChange = {(e)=>Model.loadAutomaton(e as Event)}></input>
         </div>
 
 

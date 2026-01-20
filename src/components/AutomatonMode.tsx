@@ -17,7 +17,7 @@ export function AutomatonMode({disabled}:AutomatonModeProps){
         selected_DFA = false;
     }
 
-    let selector_class = "";
+    let selector_class = "text-center ";
     if(disabled){
         selector_class = " border-red-500 text-red-500";
     }
