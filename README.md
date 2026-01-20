@@ -112,6 +112,31 @@ On the rightmost side, there is an input you can click to load an automaton. If 
 
 3. Customs images were created for each of the different options: add connection, add,delete and edit nodes. These cursors are applied when the user is on the canvas. The customs cursor images are located in the public directory of the project.
 
+# Installation
+
+1. **Prerequisites**
+Make sure you have Node.js installed. It can be installed on the official website: [Node.js](https://nodejs.org/en/download).
+
+
+2. **Clone the repository**
+
+```bash
+git clone https://github.com/mamielgil/Automaton_SIM.git
+```
+
+3. **Enter the directory**
+
+```bash
+cd Automaton_SIM
+```
+
+4. **Install the dependencies and run the project locally**
+Within your favourite Node.js IDE run:
+```bash
+npm install
+npm run dev
+```
+
 # Author
 
 Made by Miguel Amiel Gil.
