@@ -4,9 +4,9 @@ import { useState } from "preact/hooks";
 
 export function WordAnalysisEditor(){
 
-    let [valid_first_step,setValidity] = useState(false);
+    let [valid_first_step,set_validity] = useState(false);
     function first_step(){
-        setValidity(Model.firstStep());
+        set_validity(Model.firstStep());
     }
 
      // Small explanation about what it is defined as DFA and NFA

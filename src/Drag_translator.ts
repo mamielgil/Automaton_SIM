@@ -14,7 +14,7 @@ export class DragTranslator{
         this.movementThreshold = 2;
     }
 
-    translate_event(event:MouseEvent){
+    translateEvent(event:MouseEvent){
         // We develop a state machine that determines when a drag event occurs
         // I have considered a minimum threshold so that it requires certain movement
         switch(this.state){

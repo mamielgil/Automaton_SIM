@@ -191,7 +191,7 @@ export function handleCanvasDrag(e:Event){
         
         
     }
-    let translated_event = drag_translator.translate_event(event);
+    let translated_event = drag_translator.translateEvent(event);
     if(translated_event.type == "drag"){
         if(to_drag_node.value != -1){
             // We only selected the node so that it can be appreciated if the event is drag
