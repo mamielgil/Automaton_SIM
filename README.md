@@ -38,14 +38,39 @@ In the previous video, the nodes are deleted in the following order: 1->5->2->4-
 
 ![Change Node Name](/assets/Edit_menu2.gif)
 
-**Starting and ending status** -> these checkboxes allow to define a node as a starting or ending node. Recall that there can only be a single initial node but infinitely many final nodes. Therefore, if a node is selected as starting, if another one had been previously selected, it will become unchecked. Whenever a node is set as starting, a green left arrow pointing towards the node will be displayed. Moreover, if a node is final, an inner black circle will be drawn.
+**Starting and ending status** -> these checkboxes allow to define a node as a starting or ending node. Recall that there can only be a single initial node but infinitely many final nodes. Therefore, if a node is selected as starting, if another one had been previously selected, it will become unchecked. 
+
+Whenever a node is set as starting, a green left arrow pointing towards the node will be displayed. Moreover, if a node is final, an inner black circle will be drawn.
 
 ![Selection Of Starting Ending Node Status](/assets/Edit_menu3.gif)
 
+**Modifying connections** -> whenever a node is selected, the edit menu will display the connections departing from it. If a node has no connections, the connections display will be empty.
 
-Only the connections departing from it will be displayed in its edit menu. If a node has no connections, the connections display will be empty.
+Within the menu,the associated letter to the connection can be modified. Furthermore, the menu allows to delete a connection by clicking on the Delete button. The deletion is be applied automatically. 
+
+**Connections are created by default with the value -1, they must be modified to create the intended automaton.**
+
+![Editing And Deleting Connections](/assets/Edit_menu4.gif)
+
+
+5. **Analyze word tool** -> if this option is active, a menu will be displayed. The user can determine whether a word is recognized or not by the automaton located in the canvas.
+**The tool allows for two ways of computation:**
+   
+**Auto computation** -> gives directly the result of whether a given word is accepted or not.
+
+**Step by step computation** -> provides a step by step resolution of the word, allowing the user to know why a specific word was accepted or rejected.
+
+**Word resolution with a DFA**
+![Word resolution DFA](/assets/Edit_menu5.gif)
+
+**Word resolution with a NFA**
+![Word resolution NFA](/assets/Edit_menu6.gif)
 
 - When turning from NFA to DFA, if repeated transitions are detected, we reset all connections to -1(default value). This way, we avoid incompatibility.
+
+6. **Automaton-mode tool** -> 
+
+
 
 - Depending on to which side the arrow goes to we draw the text above or below the edge(connection). Moreover, **green** represents right and **left** represents connections to the left. On the other hand, **cycles** are represented with black.
 

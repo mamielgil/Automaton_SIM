@@ -1,12 +1,12 @@
 @import "tailwindcss";
 
-button{
+button:enabled{
 
-   @apply border border-black rounded font-serif enabled:hover:bg-blue-600 enabled:active:bg-gray-600 enabled:bg-blue-100;
+   @apply border border-black rounded font-serif hover:bg-blue-600 active:bg-gray-600 bg-blue-100;
 }
 
 button:disabled{
-   @apply text-red-600  border-red-600;
+   @apply border text-red-600  border-red-600;
 }
 
 input {
