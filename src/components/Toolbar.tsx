@@ -11,8 +11,8 @@ export default function Toolbar(){
         <MenuOption onClickHandler={Model.changeEditMode} stringLabel="Edit Node" checked = {Model.is_edit_tool_active.value}></MenuOption>
         <MenuOption onClickHandler={Model.activateWordAnalysis} stringLabel = "Analyze word" checked = {Model.is_word_analysis_active.value}></MenuOption>
         <AutomatonMode disabled = {Model.first_step_performed.value}></AutomatonMode>
-        <button class = "w-[200px]" onClick={Model.saveAutomaton}> Save</button>
-        <input type = "file" class = "w-full" onChange = {(e)=>Model.loadAutomaton(e as Event)}></input>
+        <button class = "w-[100px]" onClick={Model.saveAutomaton}> Save</button>
+        <input type = "file" class = "w-[250px]" onChange = {(e)=>Model.loadAutomaton(e as Event)}></input>
         </div>
 
 

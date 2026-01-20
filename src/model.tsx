@@ -162,18 +162,18 @@ export function handleCanvasClick(e:Event){
     // we perform a specific action
     if(is_add_tool_active.value){
         
-        create_node(event.offsetX,event.offsetY);
+        createNode(event.offsetX,event.offsetY);
     }
     else if(is_delete_tool_active.value){
-        handle_delete_option(e as MouseEvent);
+        handleDeleteOption(e as MouseEvent);
 
     } else if( is_connections_tool_active.value){
 
         
-        handle_connection_option(e as MouseEvent);
+        handleConnectionOption(e as MouseEvent);
     }else{
         
-        handle_no_option(e as MouseEvent);
+        handleNoOption(e as MouseEvent);
     }
 }
 
@@ -187,7 +187,7 @@ export function handleCanvasDrag(e:Event){
     let event:MouseEvent = e as MouseEvent;
     if(event.type == "mousedown"){
         // If a node is clicked it is possible that it will be dragged
-        to_drag_node.value = find_clicked_node(event.offsetX,event.offsetY).id;
+        to_drag_node.value = findClickedNode(event.offsetX,event.offsetY).id;
         
         
     }
@@ -195,22 +195,22 @@ export function handleCanvasDrag(e:Event){
     if(translated_event.type == "drag"){
         if(to_drag_node.value != -1){
             // We only selected the node so that it can be appreciated if the event is drag
-            change_node_color(to_drag_node.value);
+            changeNodeColour(to_drag_node.value);
         }
-        change_node_pos(event.target as HTMLElement,to_drag_node.value,translated_event.x,translated_event.y);
+        changeNodePos(event.target as HTMLElement,to_drag_node.value,translated_event.x,translated_event.y);
     }
     }
 
 }
 
-function handle_no_option(event:MouseEvent){
-    let collided_node = find_clicked_node(event.offsetX,event.offsetY);
+function handleNoOption(event:MouseEvent){
+    let collided_node = findClickedNode(event.offsetX,event.offsetY);
     let previous_selection = collided_node.selected;
-    reset_node_selection();
+    resetNodeSelection();
     if(collided_node.id != -1){
         if(!previous_selection){
 
-        change_node_color(collided_node.id);
+        changeNodeColour(collided_node.id);
         }
     }
 }
@@ -222,25 +222,25 @@ export function handleToolbarClick(e:Event){
 
 }
 
-function handle_connection_option(event:MouseEvent){
+function handleConnectionOption(event:MouseEvent){
 
     // We determine if we selected one node to create the connection
-        let collided_node = find_clicked_node(event.offsetX,event.offsetY);
+        let collided_node = findClickedNode(event.offsetX,event.offsetY);
 
             if(collided_node.id != -1){
                 if(connectionPair.starting_node == -1){
-                    reset_node_selection();
+                    resetNodeSelection();
                     // This means that it is the first node that was clicked
                 connectionPair.starting_node = collided_node.id;
                 // To identify that this node was selected, we are going to change its color
-                change_node_color(collided_node.id);
+                changeNodeColour(collided_node.id);
 
                 }else if( connectionPair.ending_node == -1){
                     // This means that it is the second node that was clicked
                     connectionPair.ending_node = collided_node.id;
-                    let credentials: node_props = find_node_credentials(collided_node.id);
-                    create_connection(connectionPair.starting_node,connectionPair.ending_node,credentials.name,connectionPair.associated_letter);
-                    reset_node_selection();
+                    let credentials: node_props = findNodeCredentials(collided_node.id);
+                    createConnection(connectionPair.starting_node,connectionPair.ending_node,credentials.name,connectionPair.associated_letter);
+                    resetNodeSelection();
 
                 } else{
                     // In this case, we need to reset the previous connection to establish the new one
@@ -248,7 +248,7 @@ function handle_connection_option(event:MouseEvent){
 
 
                     // We set the clicked node to a different color so that the user knows that it was selected
-                    change_node_color(collided_node.id);
+                    changeNodeColour(collided_node.id);
                 }
             
             
@@ -256,7 +256,7 @@ function handle_connection_option(event:MouseEvent){
     }
 }
 
-export function find_node_credentials(node_id:number){
+export function findNodeCredentials(node_id:number){
 
     let credentials:node_props = {id:-1,name:"-1",pos_x:-1,pos_y:-1,selected:false,connections:[],starting_node:false,final_node:false};
     nodes.value.forEach((node)=>{
@@ -269,7 +269,7 @@ export function find_node_credentials(node_id:number){
 
 }
 
-function change_node_pos(event_target:HTMLElement,collided_id:number,transl_x:number,transl_y:number){
+function changeNodePos(event_target:HTMLElement,collided_id:number,transl_x:number,transl_y:number){
 
     // We go through all the nodes and change its coordinates to the one of the translated event
 
@@ -289,7 +289,7 @@ function change_node_pos(event_target:HTMLElement,collided_id:number,transl_x:nu
     nodes.value = [...nodes.value];
 }
 
-function change_node_color(collided_id:number){
+function changeNodeColour(collided_id:number){
 
     // Changing the color is changing its selection state so that it has a different color
     nodes.value.forEach((node)=>{
@@ -304,7 +304,7 @@ function change_node_color(collided_id:number){
 
 }
 
-function reset_node_selection(){
+function resetNodeSelection(){
 
     // This method resets all nodes to non selected
     nodes.value.forEach((node)=>{
@@ -313,19 +313,19 @@ function reset_node_selection(){
     // We change the reference so that a rerender is triggered
     nodes.value = [...nodes.value];
 }
-function handle_delete_option(event:MouseEvent){
+function handleDeleteOption(event:MouseEvent){
 
-    let collided_node = find_clicked_node(event.offsetX,event.offsetY); 
+    let collided_node = findClickedNode(event.offsetX,event.offsetY); 
         if(collided_node.id != -1){
             // This means that the hitTest yielded true for some node
-            delete_node(collided_node.id);
+            deleteNode(collided_node.id);
         }
-
+6
 }
 
 
     // If several nodes collide only the latest node in the array will be deleted
-    function find_clicked_node(clicked_x:number,clicked_y:number){
+    function findClickedNode(clicked_x:number,clicked_y:number){
         // We go through all of the nodes and analyze if there was a node that was clicked
 
         let collided_node:node_props = {id:-1,final_node:false,starting_node:false,name:"-1",pos_x:-1,pos_y:-1,selected:false,connections:[]};
@@ -342,7 +342,7 @@ function handle_delete_option(event:MouseEvent){
         });
     return collided_node;
     }
-export function create_node(x:number,y:number){
+export function createNode(x:number,y:number){
     let new_node_info:node_props = {id:node_id,name: node_id.toString(), pos_x: x, pos_y: y, selected:false,connections:[],starting_node:false,final_node:false};
     // We increase the node id so that all nodes have a different id
     node_id++;
@@ -352,7 +352,7 @@ export function create_node(x:number,y:number){
 
 }
 
-export function delete_node(id:number){
+export function deleteNode(id:number){
     // This function deletes the node with the given id
 
     nodes.value = nodes.value.filter((node)=> node.id != id);
@@ -377,7 +377,7 @@ function resetAllButtonSignals(){
     auto_word_resolution.value = "";
 }
 
-function create_connection(starting_node:number,end_node:number,end_name:string,my_letter:string){
+function createConnection(starting_node:number,end_node:number,end_name:string,my_letter:string){
 
     // We know that the passed ids exist therefore, we just perform a for each
     nodes.value.forEach((node)=>{
@@ -391,7 +391,7 @@ function create_connection(starting_node:number,end_node:number,end_name:string,
     });
 }
 
-export function find_selected_credentials(){
+export function findSelectedCredentials(){
     if(num_nodes_selected.value === 1){
 
         let found = false;
@@ -449,7 +449,7 @@ export function updateConnection(event: Event,given_node_id:number,given_connect
         new_letter = new_letter.replace("λ","");
     }
     // We only update the connection if the introduced letter is valid
-    if(verify_new_letter_connection(new_letter)){
+    if(verifyNewLetterConnection(new_letter)){
     // We map through nodes to find the specific node, then map through its connections
     nodes.value = nodes.value.map((node) => {
         if (node.id === given_node_id) {
@@ -457,14 +457,14 @@ export function updateConnection(event: Event,given_node_id:number,given_connect
             // For a DFA we can only have a single connection for a given letter
             let can_update = true;
             if(automaton_type.value === "DFA"){
-                 can_update = check_if_not_repeated(node,new_letter);
+                can_update = checkIfNotRepeated(node,new_letter);
             }else{
                 // In a NFA we can allow as many repeated connections as we wish
                 can_update = true;
                 // We run the check if not repeated just to update the signal that stores if repeated connections exist
                 if(!repeated_letter_in_a_node){
                     // We just update it if it is not already true
-                repeated_letter_in_a_node = !check_if_not_repeated(node,new_letter);
+                repeated_letter_in_a_node = !checkIfNotRepeated(node,new_letter);
                 }
             }
             if(can_update){
@@ -489,7 +489,7 @@ export function updateConnection(event: Event,given_node_id:number,given_connect
     }
 }
 
-function verify_new_letter_connection(letter:string){
+function verifyNewLetterConnection(letter:string){
 
     // A transition can only be expressed by a single character
     if(letter.length > 1){
@@ -504,7 +504,7 @@ function verify_new_letter_connection(letter:string){
     return true;
 }
 
-function check_if_not_repeated(credentials:node_props,associated_letter:string){
+function checkIfNotRepeated(credentials:node_props,associated_letter:string){
     let found = false;
     // We  search on all of the connections to determine if there is an already existing connection with that letter
     let found_connection  = credentials.connections.find((connection)=>connection.associated_letter === associated_letter);
@@ -526,7 +526,7 @@ export function activateWordAnalysis(){
     is_word_analysis_active.value = !previous_is_analysis;
 }
 
-export function compute_word_directly(){
+export function computeWordDirectly(){
     if(exists_default_transition.value){
         // We do not allow computations until all -1 transitions have been removed
         return;
@@ -537,13 +537,13 @@ export function compute_word_directly(){
     let word = word_to_analyze.value;
 
     if(automaton_type.value == "DFA"){
-        result = DFA_word_compute(word,starting_nodes.value[0]);
+        result = DFAWordCompute(word,starting_nodes.value[0]);
         
     }else{
         //Non deterministic automaton computation
-        result = NFA_word_compute(word,starting_nodes.value[0]);
+        result = NFAWordCompute(word,starting_nodes.value[0]);
     }
-         
+    
     auto_word_resolution.value = result? "WORD IS VALID" :"WORD IS INVALID";
     // Once the word has been analyzed we reset the value of this signal
     word_to_analyze.value = "";
@@ -555,10 +555,10 @@ export function change_starting_node_status(event:Event,selected_id:number){
     let checked_status = myInput.checked;
 
     // In both DFA and NFA there can only be a single initial state
-    handle_starting_status(checked_status,selected_id);
+    handleStartingStatus(checked_status,selected_id);
 }
 
-export function handle_starting_status(checked_status:boolean,selected_id:number){
+export function handleStartingStatus(checked_status:boolean,selected_id:number){
 
     // In a DFA there can only be a single starting node
 
@@ -585,19 +585,19 @@ export function handle_starting_status(checked_status:boolean,selected_id:number
 
 }
 
-export function change_final_node_status(event:Event,selected_id:number){
+export function changeFinalNodeStatus(event:Event,selected_id:number){
     let myInput = event.target as HTMLInputElement;
 
     let checked_status = myInput.checked;
 
     // We go through all of the nodes until we find the selected node
     // we then modify its credentials
-    handle_final_status(checked_status,selected_id);
+    handleFinalStatus(checked_status,selected_id);
 
 }
 
 
-function handle_final_status(checked_status:boolean,selected_id:number){
+function handleFinalStatus(checked_status:boolean,selected_id:number){
      //In both DFA and NFA there can be infinitely many final states
 
     nodes.value = nodes.value.map((node)=>{
@@ -610,7 +610,7 @@ function handle_final_status(checked_status:boolean,selected_id:number){
         }
     });
 }
-export function delete_connection(selected_id:number,to_delete_connection:connection_props){
+export function deleteConnection(selected_id:number,to_delete_connection:connection_props){
     
     // Flag to control if a connection has already been deleted or not
     // This is used to avoid deleting all the connections that are identical.
@@ -640,10 +640,10 @@ export function delete_connection(selected_id:number,to_delete_connection:connec
     nodes.value = [...nodes.value];
 }
 
-function DFA_word_compute(word:string,starting_node:number){
+function DFAWordCompute(word:string,starting_node:number){
     
     if(word.length === 0){
-        return find_node_credentials(starting_nodes.value[0]).final_node; 
+        return findNodeCredentials(starting_nodes.value[0]).final_node; 
     }
     
     
@@ -653,7 +653,7 @@ function DFA_word_compute(word:string,starting_node:number){
     let current_node_id = starting_node;
 
     for(let letter of word){
-        let current_node = find_node_credentials(current_node_id);
+        let current_node = findNodeCredentials(current_node_id);
 
         // In case there is a wrong node that was passed
         if(current_node.id === -1){return false;}
@@ -674,17 +674,17 @@ function DFA_word_compute(word:string,starting_node:number){
     }
     // Once we have gone through all of the letters, if we exit the loop
     // then the word will be valid if the end node is final
-    return find_node_credentials(current_node_id).final_node;
+    return findNodeCredentials(current_node_id).final_node;
 }
 
 
-function NFA_word_compute(word:string,starting_node:number){
+function NFAWordCompute(word:string,starting_node:number){
     // We implement BFS to analyze all the possible paths but stop on the 
     // shallowest one, to reduce unnecessary computations
 
     // We first see what nodes we can get by just using lambda transitions
-    let current_nodes = get_lambda_nodes([find_node_credentials(starting_node)]);
-   
+    let current_nodes = getLambdaNodes([findNodeCredentials(starting_node)]);
+
     for(let letter of word){
         let to_add_nodes:node_props[] = [];
         // We include this set to avoid adding repeating nodes for a given letter
@@ -699,7 +699,7 @@ function NFA_word_compute(word:string,starting_node:number){
                     // We mark the node to indicate that it was visited
                     visited_nodes.add(conn.ending_node);
                     // We add that node to the list of current nodes
-                    to_add_nodes.push(find_node_credentials(conn.ending_node));
+                    to_add_nodes.push(findNodeCredentials(conn.ending_node));
                 }
             });
 
@@ -712,7 +712,7 @@ function NFA_word_compute(word:string,starting_node:number){
 
         // We now replace the current_nodes array with the array of the newly visited nodes
         // plus the nodes that can be accessed through lambda transitions
-        current_nodes = get_lambda_nodes(to_add_nodes);
+        current_nodes = getLambdaNodes(to_add_nodes);
 
     }
     let result = false;
@@ -727,7 +727,7 @@ function NFA_word_compute(word:string,starting_node:number){
 }
 
 
-function get_lambda_nodes(given_nodes:node_props[]){
+function getLambdaNodes(given_nodes:node_props[]){
 
     let current_nodes = [...given_nodes];
     let reachable_nodes:node_props[] = [];
@@ -755,7 +755,7 @@ function get_lambda_nodes(given_nodes:node_props[]){
 
                 visited_ids.add(conn.ending_node);
 
-                let next_node = find_node_credentials(conn.ending_node);
+                let next_node = findNodeCredentials(conn.ending_node);
 
                 // We add the newly found node to the queue and the list of reachable nodes
                 current_nodes.push(next_node);
@@ -771,7 +771,7 @@ function get_lambda_nodes(given_nodes:node_props[]){
     return reachable_nodes;
 }
 
-export function update_word_to_analyze(event:Event){
+export function updateWordToAnalyze(event:Event){
     let myInput = event.target as HTMLInputElement;
 
     // We take the value from the input field and update 
@@ -784,7 +784,7 @@ export function update_word_to_analyze(event:Event){
 let to_visit_node:number = -1;
 let step_by_step_timeout: ReturnType<typeof setTimeout>|null = null;
 
-export function first_step(){
+export function firstStep(){
     
     if(exists_default_transition.value){
         // We do not allow computations if all default transitions(-1) have not been removed
@@ -792,7 +792,7 @@ export function first_step(){
     }
     
     // The first step is finding the starting node so that the algorithm can start
-    reset_node_selection();
+    resetNodeSelection();
     first_step_performed.value = true;
     to_visit_node = -1;
 
@@ -804,9 +804,9 @@ export function first_step(){
     if(starting_nodes.value.length > 0){
         let node_name = "";
         if(automaton_type.value === "DFA"){
-            node_name = handle_first_step_DFA();
+            node_name = handleFirstStepDFA();
         }else{
-            node_name = handle_first_step_NFA();
+            node_name = handleFirstStepNFA();
         }
         let word:string = "-1";
         if(word_to_analyze.value === ""){
@@ -829,7 +829,7 @@ export function first_step(){
     }
 }
 
-function handle_first_step_DFA(){
+function handleFirstStepDFA(){
 
     // I have separated it to highlight the use of to_visit_node for DFA
     to_visit_node = starting_nodes.value[0];
@@ -847,10 +847,10 @@ function handle_first_step_DFA(){
 
 }
 
-function handle_first_step_NFA(){
+function handleFirstStepNFA(){
 
     // I have separated it to highlight the use of to_visit_nodes for NFA
-    to_visit_nodes = [find_node_credentials(starting_nodes.value[0])];
+    to_visit_nodes = [findNodeCredentials(starting_nodes.value[0])];
     let node_name = "";
     nodes.value = nodes.value.map((node)=>{
     if(node.id === to_visit_nodes[0].id){
@@ -866,7 +866,7 @@ function handle_first_step_NFA(){
 
 }
 
-export function compute_step_by_step(){
+export function computeStepByStep(){
 
     if(step_by_step_timeout === null){
         // This means that the computations have not finished
@@ -874,14 +874,13 @@ export function compute_step_by_step(){
         // are finished the timeout is set to null until a first step
         // is executed again
         if(automaton_type.value === "DFA"){
-            DFA_step_by_step();
+            DFAStepByStep();
 
         }else{
-            NFA_step_by_step();
+            NFAStepByStep();
         }
     }
 
-   
 }
 
 // To_visit version for the NFA where we store the nodes in depth level
@@ -889,15 +888,15 @@ export function compute_step_by_step(){
 let to_visit_nodes:node_props[] = [];
 let word_finished = false;
 
-function NFA_step_by_step(){
+function NFAStepByStep(){
     // First we deselect all nodes so that we know the one that is being visited now
-    reset_node_selection();
+    resetNodeSelection();
     step_by_step_word_resolution.value = "";
 
     if(!word_finished){
     // This only runs when we have not finished processing letters. If we have, then we just want
     // to analyze the remaining accesible by lambda nodes once. If not some of them could be added several times.
-    to_visit_nodes = get_lambda_nodes(to_visit_nodes);
+    to_visit_nodes = getLambdaNodes(to_visit_nodes);
     }
 
     if(word_to_analyze.value.length === 0){
@@ -914,14 +913,14 @@ function NFA_step_by_step(){
 
         });
         // We select the nodes that are a final state and would lead to validity
-        select_nodes(to_select_nodes);
+        selectNodes(to_select_nodes);
         if(is_valid){
             step_by_step_word_resolution.value = "FINISHED: VALID WORD";
         
         }else{
             step_by_step_word_resolution.value = "FINISHED:INVALID WORD";
         }
-        reset_step_by_step_NFA();
+        resetStepByStepNFA();
         return;
     }
 
@@ -934,7 +933,7 @@ function NFA_step_by_step(){
     let to_add_nodes:node_props[] = [];
 
     // We select all of the nodes that are visited
-    select_nodes(to_visit_nodes.map((node=>node.id)));
+    selectNodes(to_visit_nodes.map((node=>node.id)));
 
     // We select all of the nodes of the same layer
     to_visit_nodes.forEach((node)=> {
@@ -946,19 +945,18 @@ function NFA_step_by_step(){
             if(conn.associated_letter === letter && !visited_nodes.has(conn.ending_node)){
 
                 visited_nodes.add(conn.ending_node);
-                to_add_nodes.push(find_node_credentials(conn.ending_node));
+                to_add_nodes.push(findNodeCredentials(conn.ending_node));
             }
         });
     
     });
-   
     word_to_analyze.value = word_to_analyze.value.slice(1);
     to_visit_nodes = to_add_nodes;
 
 }
 
 
-function reset_step_by_step_NFA(){
+function resetStepByStepNFA(){
     to_visit_nodes = [];
     word_finished = false;
     step_by_step_timeout = setTimeout(()=>{
@@ -968,15 +966,15 @@ function reset_step_by_step_NFA(){
     },3000);
 
 }
-function DFA_step_by_step(){
+function DFAStepByStep(){
 
      //First as we are going to go node through node, selecting them to indicate 
     // where we are, we need to deselect all of the nodes
-    reset_node_selection();
+    resetNodeSelection();
     
     if(word_to_analyze.value.length === 0){
-        select_nodes([to_visit_node]);
-        if(find_node_credentials(to_visit_node).final_node){
+        selectNodes([to_visit_node]);
+        if(findNodeCredentials(to_visit_node).final_node){
         step_by_step_word_resolution.value = "FINISHED: VALID WORD";
         }else{
         step_by_step_word_resolution.value = "FINISHED: INVALID WORD";
@@ -995,21 +993,21 @@ function DFA_step_by_step(){
 
     // This variable is used to know the previous node name so that
     // we can identify the transition if it is found
-    let previous_node = find_node_credentials(to_visit_node);
+    let previous_node = findNodeCredentials(to_visit_node);
     
-        valid_transition = DFA_one_step_compute(letter);
+        valid_transition = DFAOneStepCompute(letter);
 
         if(valid_transition.ending_node != -1){
             // This means that a transition was found
             result = true;
-            select_nodes([previous_node.id]);
+            selectNodes([previous_node.id]);
             
         }else{
             result = false;
             word_to_analyze.value = "";
         }
     step_by_step_word_resolution.value = "CURRENT NODE " + previous_node.name.toString();
-    step_by_step_word_resolution.value += result? " TRANSITION " + previous_node.name.toString() + "->" + find_node_credentials(to_visit_node).name + " (" + letter + ")" :" NO TRANSITION WAS FOUND";
+    step_by_step_word_resolution.value += result? " TRANSITION " + previous_node.name.toString() + "->" + findNodeCredentials(to_visit_node).name + " (" + letter + ")" :" NO TRANSITION WAS FOUND";
     if(!result){
         // Transition was not found so we reset the parameter
         to_visit_node = -1;
@@ -1017,11 +1015,11 @@ function DFA_step_by_step(){
 
 }
 
-function DFA_one_step_compute(letter:string){
+function DFAOneStepCompute(letter:string){
 
     
     // Now we check if there is a valid transition
-    let current_credentials = find_node_credentials(to_visit_node);
+    let current_credentials = findNodeCredentials(to_visit_node);
 
     let valid_transition = current_credentials.connections.find((connection)=>{
         return connection.associated_letter === letter;
@@ -1040,7 +1038,7 @@ function DFA_one_step_compute(letter:string){
         return {ending_node:-1,associated_letter:"-1",ending_name:"-1",connection_id:-1}; 
 }
 
-function select_nodes(node_ids:number[]){
+function selectNodes(node_ids:number[]){
     nodes.value = nodes.value.map((node)=>{
         if(node_ids.includes(node.id)){
             return{...node,selected:true};
@@ -1051,7 +1049,7 @@ function select_nodes(node_ids:number[]){
     })
 }
 
-export function change_automaton_mode(event:Event){
+export function changeAutomatonMode(event:Event){
 
     let mySelector = event.target as HTMLSelectElement;
     
@@ -1062,11 +1060,11 @@ export function change_automaton_mode(event:Event){
     if(automaton_type.value === "DFA" && (repeated_letter_in_a_node || added_lambda_transition)){
         // This means that there are nodes with repeated transitions which we cannot allow
         // As a result, we are going to reset all transitions to -1 so that they can be reassigned again
-        reset_transitions();
+        resetTransitions();
     }
 }
 
-function reset_transitions(){
+function resetTransitions(){
     nodes.value = nodes.value.map((node)=>{
         let my_connections = node.connections;
 
@@ -1153,7 +1151,6 @@ export async function loadAutomaton(e:Event){
 
         if(format_correct){
 
-          
             // If the format is correct, now we obtain the updated info based on the 
             // file data
             let updatedInfo = loadNodesFromJSON(myAutomaton.nodes);
@@ -1224,7 +1221,7 @@ function loadNodesFromJSON(loaded_nodes:node_props[]){
 
                 if(old_id !== undefined){
                    // We update the connection accordingly
-                   conn.ending_node = old_id;
+                    conn.ending_node = old_id;
 
                     if(conn.associated_letter === "λ"){
                         has_lambda = true;

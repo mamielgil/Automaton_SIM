@@ -23,7 +23,7 @@ export function AutomatonMode({disabled}:AutomatonModeProps){
     }
 
     return(
-        <select class = {selector_class} disabled = {disabled} onChange = {(event)=>Model.change_automaton_mode(event)}>
+        <select class = {selector_class} disabled = {disabled} onChange = {(event)=>Model.changeAutomatonMode(event)}>
             <option selected = {selected_DFA} >DFA</option>
             <option selected = {selected_NFA}>NFA</option>
         </select>

@@ -15,7 +15,7 @@ export function Canvas(){
         let new_dimensions = my_canvas.getBoundingClientRect();
         my_canvas.width = new_dimensions.width;
         my_canvas.height = new_dimensions.height;
-        draw_canvas();
+        drawCanvas();
     }
 
     
@@ -29,11 +29,11 @@ export function Canvas(){
         return ()=> canvas_observer.disconnect();
     },[])
     useLayoutEffect(()=>{
-        draw_canvas();
+        drawCanvas();
 
 },[Model.nodes.value]);
 
-    function draw_canvas(){
+    function drawCanvas(){
         
         
         let gc = canvasRef.current?.getContext("2d");
@@ -50,7 +50,7 @@ export function Canvas(){
             // Each render, we create new nodes after having deleted
             // the previous ones
             new_node.draw(gc);
-            new_node.draw_connections(gc);
+            new_node.drawConnections(gc);
             
             
         });

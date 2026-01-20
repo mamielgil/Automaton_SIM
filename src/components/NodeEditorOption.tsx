@@ -7,7 +7,7 @@ export type NodeEditorOptionProps = {
 
 // This component is used to represent the options that are displayed in the edit and analyze word menus
 export function NodeEditorOption({my_label,my_value_input,onInputHandler, disabled}: NodeEditorOptionProps){
-   
+    
     return(
     <div class = "flex box-border items-center gap-[5px]">
         <label class = "w-full">{my_label}</label>
