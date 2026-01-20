@@ -107,7 +107,7 @@ On the rightmost side, there is an input you can click to load an automaton. If 
 
 When no option is selected, the user can drag the nodes to change the visual arrangement of the automaton. For example to see the connections more clearly. It can be appreciated in the following example:
 
-[Node drag](/assets/No_option.gif)
+![Node drag](/assets/No_option.gif)
 
 
 ## Additional information and conventions
