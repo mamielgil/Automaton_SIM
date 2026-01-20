@@ -1199,24 +1199,46 @@ function loadNodesFromJSON(loaded_nodes:node_props[]){
         let has_repeated_letter = false;
 
         // We reset the ids and reestablish all connections with new ids to force univocal ids
+        let prevIdNewIdMapping = new Map<number,number>();
 
         loaded_nodes.forEach((node)=>{
-            node.id = node_id++;
+            if(!prevIdNewIdMapping.has(node.id)){
+                prevIdNewIdMapping.set(node.id,node_id++);
+            }
+            // Once the mapping has been stored we update it to its new ID
+            node.id = prevIdNewIdMapping.get(node.id) as number;
+        });
+
+        loaded_nodes.forEach((node)=>{
+
             let current_letters_in_connections = new Set<string>();
+            
+            // We just keep the connections in which only existing nodes participate. If there a connections to a given
+            // node is not found, it is simply deleted
+            node.connections = node.connections.filter((conn)=>{return prevIdNewIdMapping.has(conn.ending_node);});
+            
             node.connections.forEach((conn)=>{
                 conn.connection_id = connection_id++;
-                if(conn.associated_letter === "λ"){
-                    has_lambda = true;
-                }
+                
+                let old_id = prevIdNewIdMapping.get(conn.ending_node);
 
-                if(current_letters_in_connections.has(conn.associated_letter)){
-                    // This means a given node has several connections with the same letter
-                    has_repeated_letter = true;
+                if(old_id !== undefined){
+                   // We update the connection accordingly
+                   conn.ending_node = old_id;
 
-                }else{
-                    // If it was not previously contained, we add it
-                    current_letters_in_connections.add(conn.associated_letter);
-                }
+                    if(conn.associated_letter === "λ"){
+                        has_lambda = true;
+                    }
+
+                    if(current_letters_in_connections.has(conn.associated_letter)){
+                        // This means a given node has several connections with the same letter
+                        has_repeated_letter = true;
+
+                    }else{
+                        // If it was not previously contained, we add it
+                        current_letters_in_connections.add(conn.associated_letter);
+                    }
+            }
             });
         });
 
