@@ -17,8 +17,8 @@ This tool allows to add a default connection between two nodes. Once the mode is
 
 **Two types of connections can be added** 
 
-    - Cycles, those are connections to itself.
-    - Connections to another node.
+- Cycles, those are connections to itself.
+- Connections to another node.
 
 ![Add Connection Utilization](/assets/Add_connection.gif)
 
