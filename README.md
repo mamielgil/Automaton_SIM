@@ -137,6 +137,8 @@ npm install
 npm run dev
 ```
 
+5. Enjoy!
+
 # Author
 
 Made by Miguel Amiel Gil.
