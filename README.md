@@ -14,6 +14,7 @@ Each of the tools are activated by clicking on the designated radio button.
 ### 1.Add connection
 
 This tool allows to add a default connection between two nodes. Once the mode is active, you must click on the node you want to become the starting node. Then, continue by clicking on the node you wish to become the ending node of the connection. You will see that a default connection(associated letter -1) will be displayed on the canvas.
+
 **Two types of connections can be added** 
     - Cycles, those are connections to itself.
     - Connections to another node.
