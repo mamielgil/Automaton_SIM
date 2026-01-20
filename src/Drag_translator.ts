@@ -11,7 +11,7 @@ export class DragTranslator{
         this.state = "IDLE";
         this.initial_x = 0;
         this.initial_y = 0;
-        this.movementThreshold = 10;
+        this.movementThreshold = 2;
     }
 
     translate_event(event:MouseEvent){
