@@ -97,7 +97,7 @@ Depending on the current chosen automaton, the analyze word menu will display a 
 
 ### 7.Save Automaton
 
-The website includes a save button which allows to download your current automaton shoudl you wish using it later. The automaton is stored in a json file, storing the nodes information as well as their corresponding connections. Once the button is clicked, a json file called automaton.json will be downloaded into the Downloads folder of your device.
+The website includes a save button which allows to download your current automaton should you wish using it later. The automaton is stored in a json file, storing the nodes information as well as their corresponding connections. Once the button is clicked, a json file called automaton.json will be downloaded into the Downloads folder of your device.
 
 ### 8. Load Automaton
 
