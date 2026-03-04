@@ -1,5 +1,5 @@
 # Automaton_SIM
-Preact application that simulates Finite Automaton
+Preact application that simulates Finite Automata
 
 # Explanation
 
